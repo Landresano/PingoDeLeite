@@ -58,8 +58,8 @@ export default function DashboardPage() {
   // Enrich client data with event counts and revenue
   const clientsWithStats = clients.map((client) => ({
     ...client,
-    eventCount: eventsPerClient[client.id]?.count || 0,
-    totalRevenue: eventsPerClient[client.id]?.revenue || 0,
+    eventCount: eventsPerClient[client.id || client._id]?.count || 0,
+    totalRevenue: eventsPerClient[client.id || client._id]?.revenue || 0,
   }))
 
   // Sort clients by event count (descending)
@@ -161,15 +161,15 @@ export default function DashboardPage() {
                   </tr>
                 ) : (
                   sortedClients.map((client) => (
-                    <tr key={client.id} className="border-b hover:bg-muted/50">
-                      <td className="py-3 px-2">{client.id}</td>
+                    <tr key={client.id || client._id} className="border-b hover:bg-muted/50">
+                      <td className="py-3 px-2">{client.id || client._id}</td>
                       <td className="py-3 px-2">{client.nome}</td>
                       <td className="py-3 px-2">{client.cpfCnpj}</td>
                       <td className="py-3 px-2">-</td>
                       <td className="py-3 px-2 text-center">{client.eventCount}</td>
                       <td className="py-3 px-2 text-right">{formatCurrency(client.totalRevenue)}</td>
                       <td className="py-3 px-2 text-center">
-                        <Link href={`/clientes/${client.id}`} className="text-primary hover:underline">
+                        <Link href={`/clientes/${client.id || client._id}`} className="text-primary hover:underline">
                           Detalhes
                         </Link>
                       </td>

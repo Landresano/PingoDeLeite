@@ -5,164 +5,174 @@ import { getCurrentUser } from "./auth-service"
 let clients: Client[] = [
   {
     id: "100001",
-    name: "Maria Silva",
-    document: "123.456.789-00",
-    age: 35,
-    address: "Rua das Flores, 123",
-    children: 2,
-    comments: "Cliente desde 2020",
+    nome: "Maria Silva",
+    cpfCnpj: "123.456.789-00",
+    idade: 35,
+    endereco: "Rua das Flores, 123",
+    filhos: 2,
+    comentarios: "Cliente desde 2020",
   },
   {
     id: "100002",
-    name: "João Oliveira",
-    document: "987.654.321-00",
-    age: 42,
-    address: "Av. Principal, 456",
-    children: 1,
-    comments: "Prefere eventos aos finais de semana",
+    nome: "João Oliveira",
+    cpfCnpj: "987.654.321-00",
+    idade: 42,
+    endereco: "Av. Principal, 456",
+    filhos: 1,
+    comentarios: "Prefere eventos aos finais de semana",
   },
   {
     id: "100003",
-    name: "Empresa ABC Ltda",
-    document: "12.345.678/0001-90",
-    address: "Rua Comercial, 789",
-    comments: "Eventos corporativos",
+    nome: "Empresa ABC Ltda",
+    cpfCnpj: "12.345.678/0001-90",
+    endereco: "Rua Comercial, 789",
+    comentarios: "Eventos corporativos",
   },
   {
     id: "100004",
-    name: "Ana Souza",
-    document: "456.789.123-00",
-    age: 28,
-    address: "Rua das Palmeiras, 321",
-    children: 0,
-    comments: "Gosta de decorações coloridas",
+    nome: "Ana Souza",
+    cpfCnpj: "456.789.123-00",
+    idade: 28,
+    endereco: "Rua das Palmeiras, 321",
+    filhos: 0,
+    comentarios: "Gosta de decorações coloridas",
   },
   {
     id: "100005",
-    name: "Carlos Mendes",
-    document: "789.123.456-00",
-    age: 45,
-    address: "Av. Central, 654",
-    children: 3,
-    comments: "Cliente VIP",
+    nome: "Carlos Mendes",
+    cpfCnpj: "789.123.456-00",
+    idade: 45,
+    endereco: "Av. Central, 654",
+    filhos: 3,
+    comentarios: "Cliente VIP",
   },
 ]
 
 let events: Event[] = [
   {
     id: "200001",
-    name: "Aniversário 10 anos",
-    date: "2023-12-15",
-    clientId: "100001",
-    balloon: {
-      nationality: "Importado",
-      customization: "Customizado",
-      filling: "Muito Preenchimento",
-      meters: 7,
+    nome: "Aniversário 10 anos",
+    data: "2023-12-15",
+    clienteId: "100001",
+    baloes: {
+      nacionalidade: "Importado",
+      customizacao: "Customizado",
+      preenchimento: "Muito Preenchimento",
+      metros: 7,
       shine: 3,
     },
-    specialBalloons: [
+    baloesEspeciais: [
       {
-        type: "Esphera",
-        size: '18"',
-        quantity: 5,
+        tipo: "Esphera",
+        tamanho: '18"',
+        quantidade: 5,
         price: 30,
       },
       {
-        type: "Bubble com Confete",
-        size: '24"',
-        quantity: 2,
+        tipo: "Bubble com Confete",
+        tamanho: '24"',
+        quantidade: 2,
         price: 60,
       },
     ],
-    totalPrice: 1470,
+    precoTotal: 1470,
+    clienteNome: "",
+    status: ""
   },
   {
     id: "200002",
-    name: "Festa Corporativa",
-    date: "2023-11-20",
-    clientId: "100003",
-    balloon: {
-      nationality: "Nacional",
-      customization: "Meio a Meio",
-      filling: "Bom Preenchimento",
-      meters: 12,
+    nome: "Festa Corporativa",
+    data: "2023-11-20",
+    clienteId: "100003",
+    baloes: {
+      nacionalidade: "Nacional",
+      customizacao: "Meio a Meio",
+      preenchimento: "Bom Preenchimento",
+      metros: 12,
       shine: 5,
     },
-    specialBalloons: [
+    baloesEspeciais: [
       {
-        type: "Bubble Foil",
-        size: "Tamanho Unico",
-        quantity: 10,
+        tipo: "Bubble Foil",
+        tamanho: "Tamanho Unico",
+        quantidade: 10,
         price: 20,
       },
     ],
-    totalPrice: 1350,
+    precoTotal: 1350,
+    clienteNome: "",
+    status: ""
   },
   {
     id: "200003",
-    name: "Casamento",
-    date: "2024-02-10",
-    clientId: "100004",
-    balloon: {
-      nationality: "Importado",
-      customization: "Customizado",
-      filling: "Muito Preenchimento",
-      meters: 15,
+    nome: "Casamento",
+    data: "2024-02-10",
+    clienteId: "100004",
+    baloes: {
+      nacionalidade: "Importado",
+      customizacao: "Customizado",
+      preenchimento: "Muito Preenchimento",
+      metros: 15,
       shine: 8,
     },
-    specialBalloons: [
+    baloesEspeciais: [
       {
-        type: "Bubble com Balão",
-        size: '18"',
-        quantity: 8,
+        tipo: "Bubble com Balão",
+        tamanho: '18"',
+        quantidade: 8,
         price: 40,
       },
       {
-        type: "Esphera",
-        size: '24"',
-        quantity: 4,
+        tipo: "Esphera",
+        tamanho: '24"',
+        quantidade: 4,
         price: 40,
       },
     ],
-    totalPrice: 3160,
+    precoTotal: 3160,
+    clienteNome: "",
+    status: ""
   },
   {
     id: "200004",
-    name: "Festa Infantil",
-    date: "2024-01-05",
-    clientId: "100002",
-    balloon: {
-      nationality: "Nacional",
-      customization: "Customizado",
-      filling: "Bom Preenchimento",
-      meters: 5,
+    nome: "Festa Infantil",
+    data: "2024-01-05",
+    clienteId: "100002",
+    baloes: {
+      nacionalidade: "Nacional",
+      customizacao: "Customizado",
+      preenchimento: "Bom Preenchimento",
+      metros: 5,
       shine: 2,
     },
-    specialBalloons: [
+    baloesEspeciais: [
       {
-        type: "Bubble Simples",
-        size: '11"',
-        quantity: 15,
+        tipo: "Bubble Simples",
+        tamanho: '11"',
+        quantidade: 15,
         price: 15,
       },
     ],
-    totalPrice: 715,
+    precoTotal: 715,
+    clienteNome: "",
+    status: ""
   },
   {
     id: "200005",
-    name: "Evento Empresarial",
-    date: "2024-03-20",
-    clientId: "100005",
-    balloon: {
-      nationality: "Importado",
-      customization: "Meio a Meio",
-      filling: "Médio Preenchimento",
-      meters: 10,
+    nome: "Evento Empresarial",
+    data: "2024-03-20",
+    clienteId: "100005",
+    baloes: {
+      nacionalidade: "Importado",
+      customizacao: "Meio a Meio",
+      preenchimento: "Médio Preenchimento",
+      metros: 10,
       shine: 4,
     },
-    specialBalloons: [],
-    totalPrice: 1200,
+    baloesEspeciais: [],
+    precoTotal: 1200,
+    clienteNome: "",
+    status: ""
   },
 ]
 
@@ -213,29 +223,28 @@ export const generateId = (): string => {
 }
 
 // Log an action
-export const logAction = (action: string, entityType: string, entityId: string, before?: any, after?: any): void => {
-  const user = getCurrentUser()
+export const logAction = async (action: string, entityType: string, entityId: string, before?: any, after?: any): Promise<void> => {
+  const user = await getCurrentUser()
 
   if (!user) {
-    console.error("Cannot log action: No user is logged in")
-    return
+    console.error("Cannot log action: No user is logged in");
+    return;
   }
-
   const logEntry: LogEntry = {
     id: generateId(),
     userId: user.id,
+    userName: user.name,
     action,
-    entityType,
-    entityId,
     timestamp: new Date().toISOString(),
     details: {
       before,
       after,
     },
+    success: true
   }
 
   logs.push(logEntry)
-  saveData()
+  saveData() 
 }
 
 // Client operations
@@ -278,7 +287,7 @@ export const createClient = async (clientData: Omit<Client, "id">): Promise<Clie
   return { ...newClient }
 }
 
-export const updateClient = async (id: string, clientData: Partial<Client>): Promise<Client> => {
+export const updataClient = async (id: string, clientData: Partial<Client>): Promise<Client> => {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 500))
 
@@ -290,14 +299,14 @@ export const updateClient = async (id: string, clientData: Partial<Client>): Pro
 
   const oldClient = { ...clients[clientIndex] }
 
-  // Update client
+  // Updata client
   clients[clientIndex] = {
     ...clients[clientIndex],
     ...clientData,
   }
 
   // Log the action
-  logAction("update", "client", id, oldClient, clients[clientIndex])
+  logAction("updata", "client", id, oldClient, clients[clientIndex])
 
   // Save to localStorage
   saveData()
@@ -347,11 +356,11 @@ export const fetchEvent = async (id: string): Promise<Event> => {
   return { ...event }
 }
 
-export const fetchEventsByClient = async (clientId: string): Promise<Event[]> => {
+export const fetchEventsByClient = async (clienteId: string): Promise<Event[]> => {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 300))
 
-  return events.filter((e) => e.clientId === clientId)
+  return events.filter((e) => e.clienteId === clienteId)
 }
 
 export const createEvent = async (eventData: Omit<Event, "id">): Promise<Event> => {
@@ -374,7 +383,7 @@ export const createEvent = async (eventData: Omit<Event, "id">): Promise<Event> 
   return { ...newEvent }
 }
 
-export const updateEvent = async (id: string, eventData: Partial<Event>): Promise<Event> => {
+export const updataEvent = async (id: string, eventData: Partial<Event>): Promise<Event> => {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 500))
 
@@ -386,14 +395,14 @@ export const updateEvent = async (id: string, eventData: Partial<Event>): Promis
 
   const oldEvent = { ...events[eventIndex] }
 
-  // Update event
+  // Updata event
   events[eventIndex] = {
     ...events[eventIndex],
     ...eventData,
   }
 
   // Log the action
-  logAction("update", "event", id, oldEvent, events[eventIndex])
+  logAction("updata", "event", id, oldEvent, events[eventIndex])
 
   // Save to localStorage
   saveData()

@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { getFromLocalStorage, saveToLocalStorage, logAction } from "@/lib/local-storage"
 import { formatCpfCnpj, generateClientId } from "@/lib/utils"
+import { createClientInDB } from "@/app/actions"
 
 export default function NovoClientePage() {
   const router = useRouter()
@@ -43,10 +44,10 @@ export default function NovoClientePage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+  
     try {
       // Validate required fields
       if (!formData.nome.trim()) {
@@ -54,23 +55,13 @@ export default function NovoClientePage() {
           title: "Erro",
           description: "O nome do cliente é obrigatório",
           variant: "destructive",
-        })
-        setIsSubmitting(false)
-        return
+        });
+        setIsSubmitting(false);
+        return;
       }
-
-      // Get existing clients
-      const clients = getFromLocalStorage("clients") || []
-
-      // Generate a unique client ID
-      let clientId = generateClientId()
-      while (clients.some((client: any) => client.id === clientId)) {
-        clientId = generateClientId()
-      }
-
+  
       // Create new client object
       const newClient = {
-        id: clientId,
         nome: formData.nome.trim(),
         cpfCnpj: formData.cpfCnpj,
         idade: formData.idade ? Number.parseInt(formData.idade) : null,
@@ -78,37 +69,41 @@ export default function NovoClientePage() {
         filhos: Number.parseInt(formData.filhos) || 0,
         comentarios: formData.comentarios,
         createdAt: new Date().toISOString(),
+      };
+  
+      // Send to MongoDB via API
+      const createdClient = await createClientInDB(newClient);
+      if (!createdClient) {
+        throw new Error("Falha ao criar o cliente no banco de dados");
       }
-
-      // Save to local storage
-      saveToLocalStorage("clients", [...clients, newClient])
-
+  
       // Log the action
       logAction("create_client", {
-        clientId: newClient.id,
-        clientName: newClient.nome,
+        clientId: createdClient._id,
+        clientName: createdClient.nome,
         before: null,
-        after: newClient,
-      })
-
+        after: createdClient,
+      });
+  
+      // Show success toast
       toast({
         title: "Cliente criado",
-        description: `Cliente ${newClient.nome} criado com sucesso`,
-      })
-
+        description: `Cliente ${createdClient.nome} criado com sucesso`,
+      });
+  
       // Redirect to client list
-      router.push("/clientes")
+      router.push("/clientes");
     } catch (error) {
-      console.error("Error creating client:", error)
+      console.error("Error creating client:", error);
       toast({
         title: "Erro",
         description: "Ocorreu um erro ao criar o cliente",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">

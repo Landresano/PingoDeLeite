@@ -98,7 +98,7 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
         })),
       })
 
-      logAction("Load Event for Edit", toast, true, { eventId: id, eventName: event.nome })
+      logAction("Load Event for Edit", toast)
     } catch (error) {
       console.error("Error loading event for editing:", error)
       const errorMsg = handleError(error, toast, "Erro ao carregar dados do evento")
@@ -241,7 +241,8 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
         clientName: updatedEvent.clienteNome,
         before: events[eventIndex],
         after: updatedEvent,
-      })
+      }
+    )
 
       toast({
         title: "Evento atualizado",
@@ -355,10 +356,10 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
 
               <div className="space-y-2">
                 <Label htmlFor="cliente">Cliente *</Label>
-                <Combobox
+                  <Combobox
                   items={clients.map((client) => ({
                     label: client.nome,
-                    value: client.id,
+                    value: client.id || client._id, // Ensure unique ID (_id from MongoDB)
                   }))}
                   value={formData.clienteId}
                   onChange={handleClientSelect}

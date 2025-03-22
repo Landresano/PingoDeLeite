@@ -186,14 +186,19 @@ export default function NovoEventoPage() {
       saveToLocalStorage("events", [...events, newEvent])
 
       // Log the action
-      logAction("create_event", {
-        eventId: newEvent.id,
-        eventName: newEvent.nome,
-        clientId: newEvent.clienteId,
-        clientName: newEvent.clienteNome,
-        before: null,
-        after: newEvent,
-      })
+      logAction(
+        "create_event",
+        {
+          eventId: newEvent.id,
+          eventName: newEvent.nome,
+          clientId: newEvent.clienteId,
+          clientName: newEvent.clienteNome,
+          before: null,
+          after: newEvent,
+        },
+        true,
+        { eventId: newEvent.id, eventName: newEvent.nome }
+      )
 
       toast({
         title: "Evento criado",
@@ -281,7 +286,7 @@ export default function NovoEventoPage() {
                 <Combobox
                   items={clients.map((client) => ({
                     label: client.nome,
-                    value: client.id,
+                    value: client.id || client._id, // Ensure unique ID (_id from MongoDB)
                   }))}
                   value={formData.clienteId}
                   onChange={handleClientSelect}

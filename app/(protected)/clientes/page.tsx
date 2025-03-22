@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
 import { handleError, logAction } from "@/lib/error-handler"
+import { fetchClientsFromDB } from "@/app/actions"
 
 export default function ClientesPage() {
   const [clients, setClients] = useState<any[]>([])
@@ -21,42 +22,37 @@ export default function ClientesPage() {
   const { toast } = useToast()
 
   useEffect(() => {
-    const loadClients = () => {
+    const loadClients = async () => {
       try {
-        console.log("Loading clients from localStorage")
-
-        // Check if we're in a browser environment
-        if (typeof window === "undefined") {
-          console.log("Not in browser environment, skipping load")
-          setIsLoading(false)
-          return
+        console.log("Loading clients from MongoDB");
+  
+        setIsLoading(true);
+  
+        // Buscar clientes do MongoDB via API
+        const response = await fetchClientsFromDB();
+        if (!response || response.length === 0) {
+          console.log("No clients found in MongoDB");
+          setError("No clients found. Create your first client to get started.");
+          setClients([]);
+          setFilteredClients([]);
+        } else {
+          console.log("Clients loaded from MongoDB:", response);
+          setClients(response);
+          setFilteredClients(response);
         }
-
-        // Load clients from local storage
-        const clientsData = JSON.parse(localStorage.getItem("clients") || "[]")
-        console.log("Clients loaded:", clientsData)
-
-        if (clientsData.length === 0) {
-          console.log("No clients found")
-          setError("No clients found. Create your first client to get started.")
-        }
-
-        setClients(clientsData)
-        setFilteredClients(clientsData)
-
-        logAction("Load Clients", toast, true, { count: clientsData.length })
+  
+        logAction("Load Clients", toast, true, { count: response.length });
       } catch (err) {
-        console.error("Failed to load clients:", err)
-        const errorMsg = handleError(err, toast, "Failed to load clients")
-        setError(errorMsg)
-        logAction("Load Clients", toast, false, { error: errorMsg })
+        console.error("Failed to load clients from MongoDB:", err);
+        const errorMsg = handleError(err, toast, "Failed to load clients from MongoDB");
+        setError(errorMsg);
+        logAction("Load Clients", toast, false, { error: errorMsg });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-
-    // Ensure this runs only once and after component is mounted
-    loadClients()
+    };
+  
+    loadClients();
   }, [toast])
 
   // Filter clients based on search query
@@ -72,7 +68,7 @@ export default function ClientesPage() {
         (client) =>
           client.nome?.toLowerCase().includes(query) ||
           client.cpfCnpj?.toLowerCase().includes(query) ||
-          client.id?.includes(query),
+          client.id?.includes(query)|| client._id?.includes(query),
       )
 
       setFilteredClients(filtered)
@@ -179,15 +175,15 @@ export default function ClientesPage() {
                   </tr>
                 ) : (
                   filteredClients.map((client) => (
-                    <tr key={client.id} className="border-b hover:bg-muted/50">
-                      <td className="py-3 px-2">{client.id}</td>
+                    <tr key={client.id || client._id} className="border-b hover:bg-muted/50">
+                      <td className="py-3 px-2">{client.id || client._id}</td>
                       <td className="py-3 px-2">{client.nome}</td>
                       <td className="py-3 px-2">{client.cpfCnpj}</td>
                       <td className="py-3 px-2">{client.endereco}</td>
                       <td className="py-3 px-2 text-center">{client.filhos}</td>
                       <td className="py-3 px-2 text-center">
                         <Button variant="link" asChild className="h-auto p-0">
-                          <Link href={`/clientes/${client.id}`}>Detalhes</Link>
+                          <Link href={`/clientes/${client.id || client._id}`}>Detalhes</Link>
                         </Button>
                       </td>
                     </tr>

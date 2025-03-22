@@ -4,7 +4,10 @@ import { fetchClientsFromDB, createClientInDB } from "../mongodb/actions"
 export async function GET() {
   try {
     const clients = await fetchClientsFromDB()
-    return NextResponse.json(clients)
+    return NextResponse.json(clients.map(client => ({
+      ...client,
+      _id: client._id.toString(), // Convert ObjectId to string
+    })))
   } catch (error) {
     console.error("Error fetching clients:", error)
     return NextResponse.json({ error: "Failed to fetch clients" }, { status: 500 })
