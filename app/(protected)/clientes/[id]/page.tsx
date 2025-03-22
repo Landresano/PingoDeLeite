@@ -84,7 +84,6 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
   
         logAction("View Client Details", toast, true, { clientId: id, clientName: foundClient.nome });
       } catch (error) {
-        console.error("Error loading client details:", error);
         const errorMsg = handleError(error, toast, "Erro ao carregar dados do cliente");
         setError(errorMsg);
       } finally {
@@ -168,7 +167,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
         description: "O cliente foi excluído com sucesso",
       });
   
-      router.push("/clientes");
+      router.push("/clients");
     } catch (error) {
       console.error("Error deleting client:", error);
       const errorMsg = handleError(error, toast, "Erro ao excluir cliente");

@@ -23,21 +23,8 @@ export async function fetchClientFromDB(id: string) {
   try {
     const client = await connectToMongoDB();
     const collection = client.db(dbName).collection(collections.clients);
-
-    // Try to find client by ID
-    let foundClient = ObjectId.isValid(id) ? await collection.findOne({ _id: new ObjectId(id) }) : null;
-
-    if (!foundClient) {
-      console.warn(`Client with ID ${id} not found. Fetching the first available client.`);
-      foundClient = await collection.findOne({}); // Get the first available client
-    }
-
-    if (!foundClient) {
-      console.error("No clients exist in the database.");
-      return null;
-    }
-
-    return { ...foundClient, _id: foundClient._id.toString() }; // Ensure _id is a string
+    const foundClient = await collection.findOne({ _id: new ObjectId(id) });
+    return foundClient ? { ...foundClient, _id: foundClient._id.toString() } : null;
   } catch (error) {
     console.error("Error fetching client by ID:", error);
     return null;

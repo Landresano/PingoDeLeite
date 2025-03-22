@@ -32,39 +32,43 @@ export default function EventoDetalhesPage({ params }: { params: { id: string } 
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (typeof window === "undefined") return
+    const fetchEventDetails = async () => {
+      if (typeof window === "undefined") return
 
-    try {
-      console.log("Loading event details for ID:", id)
+      try {
+        console.log("Loading event details for ID:", id)
 
-      // Load event data
-      const events = JSON.parse(localStorage.getItem("events") || "[]")
-      console.log("All events:", events)
+        // Load event data
+        const response = await fetch(`/api/eventos/${id}`)
+        if (!response.ok) throw new Error("Evento não encontrado")
 
-      const foundEvent = events.find((e: any) => e.id === id)
-      console.log("Found event:", foundEvent)
+        const foundEvent = await response.json()
+        console.log("Found event:", foundEvent)
 
-      if (!foundEvent) {
-        const errorMsg = `Evento com ID ${id} não encontrado`
-        console.error(errorMsg)
+        if (!foundEvent) {
+          const errorMsg = `Evento com ID ${id} não encontrado`
+          console.error(errorMsg)
+          setError(errorMsg)
+          toast({
+            title: "Evento não encontrado",
+            description: errorMsg,
+            variant: "destructive",
+          })
+          return
+        }
+
+        setEvent(foundEvent)
+        logAction("View Event Details", toast, true, { eventId: id, eventName: foundEvent.nome })
+      } catch (error) {
+        console.error("Error loading event details:", error)
+        const errorMsg = handleError(error, toast, "Erro ao carregar dados do evento")
         setError(errorMsg)
-        toast({
-          title: "Evento não encontrado",
-          description: errorMsg,
-          variant: "destructive",
-        })
-        return
+      } finally {
+        setIsLoading(false)
       }
-
-      setEvent(foundEvent)
-      logAction("View Event Details", toast, true, { eventId: id, eventName: foundEvent.nome })
-    } catch (error) {
-      console.error("Error loading event details:", error)
-      const errorMsg = handleError(error, toast, "Erro ao carregar dados do evento")
-      setError(errorMsg)
-    } finally {
-      setIsLoading(false)
     }
+
+    fetchEventDetails()
   }, [id, router, toast])
 
   const handleDelete = () => {
@@ -83,7 +87,7 @@ export default function EventoDetalhesPage({ params }: { params: { id: string } 
       logAction("Delete Event", toast, true, { eventId: id, eventName: event.nome })
 
       // Redirect to event list
-      router.push("/eventos")
+      router.push("/events")
     } catch (error) {
       console.error("Error deleting event:", error)
       const errorMsg = handleError(error, toast, "Erro ao excluir evento")

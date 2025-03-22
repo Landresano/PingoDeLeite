@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
-import { getFromLocalStorage, saveToLocalStorage, logAction } from "@/lib/local-storage"
+import { logAction } from "@/lib/local-storage"
 import { calculateEventPrice, formatCurrency } from "@/lib/utils"
 
 export default function NovoEventoPage() {
@@ -22,6 +22,7 @@ export default function NovoEventoPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [clients, setClients] = useState<any[]>([])
   const [totalPrice, setTotalPrice] = useState(0)
+  // Removed unused 'events' state
 
   // Get clientId from query params if available
   const clientIdFromQuery = searchParams.get("clienteId")
@@ -49,20 +50,31 @@ export default function NovoEventoPage() {
   })
 
   useEffect(() => {
-    // Load clients from local storage
-    const clientsData = getFromLocalStorage("clients") || []
-    setClients(clientsData)
-
-    // If clientId is provided in query, set the client name
-    if (clientIdFromQuery) {
-      const selectedClient = clientsData.find((c: any) => c.id === clientIdFromQuery)
-      if (selectedClient) {
-        setFormData((prev) => ({
-          ...prev,
-          clienteNome: selectedClient.nome,
-        }))
+    const fetchClients = async () => {
+      try {
+        const response = await fetch("/api/clients")
+        if (!response.ok) throw new Error("Failed to fetch clients")
+  
+        const clientsData = await response.json()
+        console.log("Clients loaded:", clientsData)
+  
+        setClients(clientsData)
+  
+        if (clientIdFromQuery) {
+          const selectedClient = clientsData.find((c: any) => c._id === clientIdFromQuery)
+          if (selectedClient) {
+            setFormData((prev) => ({
+              ...prev,
+              clienteNome: selectedClient.nome,
+            }))
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching clients:", error)
       }
     }
+  
+    fetchClients()
   }, [clientIdFromQuery])
 
   // Calculate total price whenever form data changes
@@ -127,7 +139,14 @@ export default function NovoEventoPage() {
   }
 
   const handleClientSelect = (clientId: string) => {
-    const selectedClient = clients.find((c) => c.id === clientId)
+    const selectedClient = clients.find((c) => c._id === clientId)
+  
+    setFormData({
+      ...formData,
+      clienteId: clientId,
+      clienteNome: selectedClient ? selectedClient.nome : "",
+    })
+  
 
     setFormData({
       ...formData,
@@ -136,7 +155,7 @@ export default function NovoEventoPage() {
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
@@ -163,10 +182,24 @@ export default function NovoEventoPage() {
       }
 
       // Get existing events
-      const events = getFromLocalStorage("events") || []
+      const fetchEvents = async () => {
+        try {
+          const response = await fetch("/api/events")
+          if (!response.ok) throw new Error("Failed to fetch events")
+      
+          const eventsData = await response.json()
+          console.log("Events loaded:", eventsData)
+      
+          return eventsData
+        } catch (error) {
+          console.error("Error fetching events:", error)
+          return []
+        }
+      }
+      const events = await fetchEvents()
 
-      // Generate a unique event ID
-      const eventId = `${200000 + events.length + 1}`
+      // // Generate a unique event ID
+       const eventId = `${200000 + events.length + 1}`
 
       // Create new event object
       const newEvent = {
@@ -182,8 +215,27 @@ export default function NovoEventoPage() {
         createdAt: new Date().toISOString(),
       }
 
-      // Save to local storage
-      saveToLocalStorage("events", [...events, newEvent])
+      // Save to mongoDB
+      const saveEventToDB = async (newEvent: any) => {
+        try {
+          const response = await fetch("/api/events", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newEvent),
+          })
+      
+          if (!response.ok) throw new Error("Failed to save event")
+      
+          const savedEvent = await response.json()
+          // Optionally log the saved event
+          console.log("Saved event:", savedEvent)
+          // Optionally update local state with the new event
+          // Optionally update local state with the new event (removed setEvents as it is undefined)
+        } catch (error) {
+          console.error("Error saving event:", error)
+        }
+      }
+      await saveEventToDB(newEvent)
 
       // Log the action
       logAction("create_event", {
@@ -201,7 +253,7 @@ export default function NovoEventoPage() {
       })
 
       // Redirect to event list
-      router.push("/eventos")
+      router.push("/events")
     } catch (error) {
       console.error("Error creating event:", error)
       toast({
@@ -281,7 +333,7 @@ export default function NovoEventoPage() {
                 <Combobox
                   items={clients.map((client) => ({
                     label: client.nome,
-                    value: client.id || client._id, // Ensure unique ID (_id from MongoDB)
+                    value: client._id, // Ensure unique ID (_id from MongoDB)
                   }))}
                   value={formData.clienteId}
                   onChange={handleClientSelect}
@@ -471,7 +523,7 @@ export default function NovoEventoPage() {
           <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="text-xl font-bold">Total: {formatCurrency(totalPrice)}</div>
             <div className="flex gap-4">
-              <Button type="button" variant="outline" onClick={() => router.push("/eventos")}>
+              <Button type="button" variant="outline" onClick={() => router.push("/events")}>
                 Cancelar
               </Button>
               <Button type="submit" disabled={isSubmitting}>
@@ -484,4 +536,3 @@ export default function NovoEventoPage() {
     </div>
   )
 }
-

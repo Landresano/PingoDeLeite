@@ -250,7 +250,7 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
       })
 
       // Redirect to event details
-      router.push(`/eventos/${id}`)
+      router.push(`/events/${id}`)
     } catch (error) {
       console.error("Error updating event:", error)
       const errorMsg = handleError(error, toast, "Erro ao atualizar o evento")
@@ -549,7 +549,7 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
           <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="text-xl font-bold">Total: {formatCurrency(totalPrice)}</div>
             <div className="flex gap-4">
-              <Button type="button" variant="outline" onClick={() => router.push(`/eventos/${id}`)}>
+              <Button type="button" variant="outline" onClick={() => router.push(`/events/${id}`)}>
                 Cancelar
               </Button>
               <Button type="submit" disabled={isSubmitting}>

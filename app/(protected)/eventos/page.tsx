@@ -23,19 +23,14 @@ export default function EventosPage() {
   const { toast } = useToast()
 
   useEffect(() => {
-    const loadEvents = () => {
+    const loadEvents = async () => {
       try {
-        console.log("Loading events from localStorage")
+        console.log("Loading events from MongoDB...")
 
-        // Check if we're in a browser environment
-        if (typeof window === "undefined") {
-          console.log("Not in browser environment, skipping load")
-          setIsLoading(false)
-          return
-        }
+        const response = await fetch("/api/events") // Call API route to fetch events
+        if (!response.ok) throw new Error("Failed to fetch events")
 
-        // Load events from local storage
-        const eventsData = JSON.parse(localStorage.getItem("events") || "[]")
+        const eventsData = await response.json()
         console.log("Events loaded:", eventsData)
 
         if (eventsData.length === 0) {
@@ -57,7 +52,6 @@ export default function EventosPage() {
       }
     }
 
-    // Ensure this runs only once and after component is mounted
     loadEvents()
   }, [toast])
 
@@ -74,7 +68,7 @@ export default function EventosPage() {
         (event) =>
           event.nome?.toLowerCase().includes(query) ||
           event.clienteNome?.toLowerCase().includes(query) ||
-          event.id?.includes(query),
+          event._id?.includes(query)
       )
 
       setFilteredEvents(filtered)
@@ -149,89 +143,41 @@ export default function EventosPage() {
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan={5} className="py-4 text-center">
-                      <div className="flex justify-center items-center">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mr-2"></div>
-                        Carregando...
-                      </div>
-                    </td>
+                    <td colSpan={5} className="py-4 text-center">Carregando...</td>
                   </tr>
                 ) : filteredEvents.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-4 text-center">
-                      {searchQuery ? (
-                        <div>
-                          <p>Nenhum evento encontrado para esta busca</p>
-                          <Button variant="link" onClick={() => setSearchQuery("")} className="mt-2">
-                            Limpar busca
-                          </Button>
-                        </div>
-                      ) : (
-                        <div>
-                          <p>Nenhum evento cadastrado</p>
-                          <Button variant="outline" asChild className="mt-2">
-                            <Link href="/eventos/novo">
-                              <Plus className="mr-2 h-4 w-4" />
-                              Criar Primeiro Evento
-                            </Link>
-                          </Button>
-                        </div>
-                      )}
-                    </td>
+                    <td colSpan={5} className="py-4 text-center">Nenhum evento encontrado</td>
                   </tr>
                 ) : (
-                  filteredEvents
-                    .sort((a, b) => {
-                      try {
-                        const dateA = new Date(a.data)
-                        const dateB = new Date(b.data)
-                        if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
-                          return 0
-                        }
-                        return dateA.getTime() - dateB.getTime()
-                      } catch (err) {
-                        console.error("Error sorting dates:", err)
-                        return 0
-                      }
-                    })
-                    .map((event) => (
-                      <tr key={event.id} className="border-b hover:bg-muted/50">
-                        <td className="py-3 px-2">
-                          {(() => {
-                            try {
-                              const eventDate = new Date(event.data)
-                              if (!isNaN(eventDate.getTime())) {
-                                return eventDate.toLocaleDateString("pt-BR")
-                              }
-                              return "Data inválida"
-                            } catch (err) {
-                              return "Data inválida"
-                            }
-                          })()}
-                        </td>
-                        <td className="py-3 px-2">{event.nome}</td>
-                        <td className="py-3 px-2">{event.clienteNome}</td>
-                        <td className="py-3 px-2 text-center">
-                          <span
-                            className={cn(
-                              "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                              event.status === "Orçamento" && "bg-yellow-100 text-yellow-800",
-                              event.status === "Fechada" && "bg-blue-100 text-blue-800",
-                              event.status === "Paga" && "bg-green-100 text-green-800",
-                              event.status === "Finalizada" && "bg-purple-100 text-purple-800",
-                            )}
-                          >
-                            {event.status || "Orçamento"}
-                          </span>
-                        </td>
-                        <td className="py-3 px-2 text-right">{formatCurrency(event.precoTotal)}</td>
-                        <td className="py-3 px-2 text-center">
-                          <Button variant="link" asChild className="h-auto p-0">
-                            <Link href={`/eventos/${event.id}`}>Detalhes</Link>
-                          </Button>
-                        </td>
-                      </tr>
-                    ))
+                  filteredEvents.map((event) => (
+                    <tr key={event._id} className="border-b hover:bg-muted/50">
+                      <td className="py-3 px-2">
+                        {new Date(event.data).toLocaleDateString("pt-BR")}
+                      </td>
+                      <td className="py-3 px-2">{event.nome}</td>
+                      <td className="py-3 px-2">{event.clienteNome}</td>
+                      <td className="py-3 px-2 text-center">
+                        <span
+                          className={cn(
+                            "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+                            event.status === "Orçamento" && "bg-yellow-100 text-yellow-800",
+                            event.status === "Fechada" && "bg-blue-100 text-blue-800",
+                            event.status === "Paga" && "bg-green-100 text-green-800",
+                            event.status === "Finalizada" && "bg-purple-100 text-purple-800"
+                          )}
+                        >
+                          {event.status || "Orçamento"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-2 text-right">{formatCurrency(event.precoTotal)}</td>
+                      <td className="py-3 px-2 text-center">
+                        <Button variant="link" asChild className="h-auto p-0">
+                          <Link href={`/eventos/${event._id}`}>Detalhes</Link>
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
@@ -241,4 +187,3 @@ export default function EventosPage() {
     </div>
   )
 }
-
