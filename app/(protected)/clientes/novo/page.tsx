@@ -79,7 +79,7 @@ export default function NovoClientePage() {
   
       // Log the action
       logAction("create_client", {
-        clientId: createdClient._id,
+        clientId: createdClient.id || createdClient._id,
         clientName: createdClient.nome,
         before: null,
         after: createdClient,

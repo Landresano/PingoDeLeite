@@ -1,15 +1,40 @@
 "use server"
 
 // Todas as funções em arquivos com 'use server' devem ser assíncronas
+import { cookies } from "next/headers";
+import { fetchUserByEmailFromDB } from "@/app/actions"; // Adjusted to use absolute path alias
+import jwt from "jsonwebtoken"; // If using JWT for authentication
+
 export const getCurrentUser = async () => {
   try {
-    // Como estamos em um Server Action, não podemos acessar localStorage diretamente
-    // Retornamos null e deixamos o cliente lidar com isso
-    return null
-  } catch {
-    return null
+    // Get token from cookies
+    const token = cookies().get("auth_token")?.value;
+
+    if (!token) {
+      return null; // No user logged in
+    }
+
+    // Decode token (Replace 'your-secret-key' with your actual secret)
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
+    if (!decoded || !decoded.email) {
+      return null;
+    }
+
+    // Fetch user from database
+    const user = await fetchUserByEmailFromDB(decoded.email);
+
+    // Return user data, excluding sensitive info
+    if (user) {
+      const { password, ...safeUser } = user;
+      return safeUser;
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error getting current user:", error);
+    return null;
   }
-}
+};
 
 export const sendPasswordResetEmail = async (email: string) => {
   // In a real application, this function would:

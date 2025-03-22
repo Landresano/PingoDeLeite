@@ -186,19 +186,14 @@ export default function NovoEventoPage() {
       saveToLocalStorage("events", [...events, newEvent])
 
       // Log the action
-      logAction(
-        "create_event",
-        {
-          eventId: newEvent.id,
-          eventName: newEvent.nome,
-          clientId: newEvent.clienteId,
-          clientName: newEvent.clienteNome,
-          before: null,
-          after: newEvent,
-        },
-        true,
-        { eventId: newEvent.id, eventName: newEvent.nome }
-      )
+      logAction("create_event", {
+        eventId: newEvent.id,
+        eventName: newEvent.nome,
+        clientId: newEvent.clienteId,
+        clientName: newEvent.clienteNome,
+        before: null,
+        after: newEvent,
+      })
 
       toast({
         title: "Evento criado",

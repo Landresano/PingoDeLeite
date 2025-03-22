@@ -25,6 +25,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { formatCurrency } from "@/lib/utils"
 import { handleError, logAction } from "@/lib/error-handler"
+import { fetchClientFromDB, fetchEventsByClientFromDB, updateClientInDB, deleteClientFromDB } from "@/app/actions"; 
+
 
 export default function ClienteDetalhesPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -49,58 +51,49 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
   })
 
   useEffect(() => {
-    // Load client data
-    try {
-      console.log("Loading client details for ID:", id)
-
-      const clients = JSON.parse(localStorage.getItem("clients") || "[]")
-      console.log("All clients:", clients)
-
-      const foundClient = clients.find((c: any) => c.id === id)
-      console.log("Found client:", foundClient)
-
-      if (!foundClient) {
-        const errorMsg = "Cliente não encontrado"
-        console.error(errorMsg)
-        setError(errorMsg)
-        toast({
-          title: "Cliente não encontrado",
-          description: "O cliente solicitado não foi encontrado",
-          variant: "destructive",
-        })
-        return
+    const loadClientData = async () => {
+      setIsLoading(true);
+      try {
+        console.log("Fetching client details for ID:", id);
+  
+        // Fetch client from MongoDB
+        const foundClient = await fetchClientFromDB(id);
+        console.log("Fetched client:", foundClient);
+  
+        if (!foundClient) {
+          throw new Error("Cliente não encontrado");
+        }
+  
+        setClient(foundClient);
+  
+        // Initialize form data
+        setFormData({
+          nome: foundClient.nome || "",
+          cpfCnpj: foundClient.cpfCnpj || "",
+          idade: foundClient.idade ? foundClient.idade.toString() : "",
+          endereco: foundClient.endereco || "",
+          filhos: foundClient.filhos ? foundClient.filhos.toString() : "0",
+          comentarios: foundClient.comentarios || "",
+        });
+  
+        // Fetch related events
+        const clientEvents = await fetchEventsByClientFromDB(id);
+        console.log("Fetched client events:", clientEvents);
+  
+        setClientEvents(clientEvents);
+  
+        logAction("View Client Details", toast, true, { clientId: id, clientName: foundClient.nome });
+      } catch (error) {
+        console.error("Error loading client details:", error);
+        const errorMsg = handleError(error, toast, "Erro ao carregar dados do cliente");
+        setError(errorMsg);
+      } finally {
+        setIsLoading(false);
       }
-
-      setClient(foundClient)
-
-      // Initialize form data
-      setFormData({
-        nome: foundClient.nome || "",
-        cpfCnpj: foundClient.cpfCnpj || "",
-        idade: foundClient.idade ? foundClient.idade.toString() : "",
-        endereco: foundClient.endereco || "",
-        filhos: foundClient.filhos ? foundClient.filhos.toString() : "0",
-        comentarios: foundClient.comentarios || "",
-      })
-
-      // Load client events
-      const events = JSON.parse(localStorage.getItem("events") || "[]")
-      console.log("All events:", events)
-
-      const clientEvents = events.filter((e: any) => e.clienteId === id)
-      console.log("Client events:", clientEvents)
-
-      setClientEvents(clientEvents)
-
-      logAction("View Client Details", toast, true, { clientId: id, clientName: foundClient.nome })
-    } catch (error) {
-      console.error("Error loading client details:", error)
-      const errorMsg = handleError(error, toast, "Erro ao carregar dados do cliente")
-      setError(errorMsg)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [id, router, toast])
+    };
+  
+    loadClientData();
+  }, [id, toast]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -110,25 +103,16 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
     })
   }
 
-  const handleSave = () => {
-    setIsSaving(true)
-
+  const handleSave = async () => {
+    setIsSaving(true);
+  
     try {
-      console.log("Saving client changes:", formData)
-
-      // Validate required fields
+      console.log("Saving client changes:", formData);
+  
       if (!formData.nome.trim()) {
-        throw new Error("O nome do cliente é obrigatório")
+        throw new Error("O nome do cliente é obrigatório");
       }
-
-      // Get all clients
-      const clients = JSON.parse(localStorage.getItem("clients") || "[]")
-      const clientIndex = clients.findIndex((c: any) => c.id === id)
-
-      if (clientIndex === -1) {
-        throw new Error("Cliente não encontrado")
-      }
-
+  
       // Create updated client object
       const updatedClient = {
         ...client,
@@ -139,74 +123,61 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
         filhos: Number.parseInt(formData.filhos) || 0,
         comentarios: formData.comentarios,
         updatedAt: new Date().toISOString(),
+      };
+  
+      // Update client in MongoDB
+      const success = await updateClientInDB(id, updatedClient);
+  
+      if (!success) {
+        throw new Error("Erro ao atualizar cliente");
       }
-
-      // Update client in array
-      clients[clientIndex] = updatedClient
-
-      // Save to local storage
-      localStorage.setItem("clients", JSON.stringify(clients))
-
-      // Update events with new client name
-      const events = JSON.parse(localStorage.getItem("events") || "[]")
-      const updatedEvents = events.map((event: any) => {
-        if (event.clienteId === id) {
-          return {
-            ...event,
-            clienteNome: updatedClient.nome,
-          }
-        }
-        return event
-      })
-
-      localStorage.setItem("events", JSON.stringify(updatedEvents))
-
-      // Update state
-      setClient(updatedClient)
-      setIsEditing(false)
-
-      logAction("Update Client", toast, true, { clientId: id, clientName: updatedClient.nome })
-
+  
+      setClient(updatedClient);
+      setIsEditing(false);
+  
+      logAction("Update Client", toast, true, { clientId: id, clientName: updatedClient.nome });
+  
       toast({
         title: "Cliente atualizado",
         description: "As informações do cliente foram atualizadas com sucesso",
-      })
+      });
     } catch (error) {
-      console.error("Error updating client:", error)
-      const errorMsg = handleError(error, toast, "Erro ao atualizar cliente")
-      setError(errorMsg)
+      console.error("Error updating client:", error);
+      const errorMsg = handleError(error, toast, "Erro ao atualizar cliente");
+      setError(errorMsg);
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    setIsDeleting(true);
+  
     try {
-      console.log("Deleting client:", id)
-
-      // Get all clients
-      const clients = JSON.parse(localStorage.getItem("clients") || "[]")
-      const filteredClients = clients.filter((c: any) => c.id !== id)
-
-      // Save to local storage
-      localStorage.setItem("clients", JSON.stringify(filteredClients))
-
-      logAction("Delete Client", toast, true, { clientId: id, clientName: client.nome })
-
+      console.log("Deleting client:", id);
+  
+      const success = await deleteClientFromDB(id);
+      if (!success) {
+        throw new Error("Erro ao excluir cliente");
+      }
+  
+      logAction("Delete Client", toast, true, { clientId: id, clientName: client.nome });
+  
       toast({
         title: "Cliente excluído",
         description: "O cliente foi excluído com sucesso",
-      })
-
-      // Redirect to client list
-      router.push("/clientes")
+      });
+  
+      router.push("/clientes");
     } catch (error) {
-      console.error("Error deleting client:", error)
-      const errorMsg = handleError(error, toast, "Erro ao excluir cliente")
-      setError(errorMsg)
-      setIsDeleting(false)
+      console.error("Error deleting client:", error);
+      const errorMsg = handleError(error, toast, "Erro ao excluir cliente");
+      setError(errorMsg);
+    } finally {
+      setIsDeleting(false);
     }
-  }
+  };
+  
 
   if (isLoading) {
     return (

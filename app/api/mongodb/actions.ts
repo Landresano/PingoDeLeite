@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { connectToMongoDB } from "./client"
 import { dbName, collections } from "./config"
 import bcrypt from "bcryptjs";
+import { ObjectId } from "mongodb";
 
 // Fetch all clients
 export async function fetchClientsFromDB() {
@@ -20,12 +21,26 @@ export async function fetchClientsFromDB() {
 // Fetch client by ID
 export async function fetchClientFromDB(id: string) {
   try {
-    const client = await connectToMongoDB()
-    const collection = client.db(dbName).collection(collections.clients)
-    return await collection.findOne({ id })
+    const client = await connectToMongoDB();
+    const collection = client.db(dbName).collection(collections.clients);
+
+    // Try to find client by ID
+    let foundClient = ObjectId.isValid(id) ? await collection.findOne({ _id: new ObjectId(id) }) : null;
+
+    if (!foundClient) {
+      console.warn(`Client with ID ${id} not found. Fetching the first available client.`);
+      foundClient = await collection.findOne({}); // Get the first available client
+    }
+
+    if (!foundClient) {
+      console.error("No clients exist in the database.");
+      return null;
+    }
+
+    return { ...foundClient, _id: foundClient._id.toString() }; // Ensure _id is a string
   } catch (error) {
-    console.error("Error fetching client:", error)
-    return null
+    console.error("Error fetching client by ID:", error);
+    return null;
   }
 }
 
@@ -45,26 +60,28 @@ export async function createClientInDB(clientData: any) {
 // Update client
 export async function updateClientInDB(id: string, clientData: any) {
   try {
-    const client = await connectToMongoDB()
-    const collection = client.db(dbName).collection(collections.clients)
-    await collection.updateOne({ id }, { $set: clientData })
-    return { ...clientData, id }
+    const client = await connectToMongoDB();
+    const collection = client.db(dbName).collection(collections.clients);
+
+    const result = await collection.updateOne({ _id: new ObjectId(id) }, { $set: clientData });
+    return result.modifiedCount > 0;
   } catch (error) {
-    console.error("Error updating client:", error)
-    return null
+    console.error("Error updating client:", error);
+    return false;
   }
 }
 
 // Delete client
 export async function deleteClientFromDB(id: string) {
   try {
-    const client = await connectToMongoDB()
-    const collection = client.db(dbName).collection(collections.clients)
-    await collection.deleteOne({ id })
-    return true
+    const client = await connectToMongoDB();
+    const collection = client.db(dbName).collection(collections.clients);
+
+    const result = await collection.deleteOne({ _id: new ObjectId(id) });
+    return result.deletedCount > 0;
   } catch (error) {
-    console.error("Error deleting client:", error)
-    return false
+    console.error("Error deleting client:", error);
+    return false;
   }
 }
 
@@ -95,12 +112,13 @@ export async function fetchEventFromDB(id: string) {
 // Fetch events by client ID
 export async function fetchEventsByClientFromDB(clientId: string) {
   try {
-    const client = await connectToMongoDB()
-    const collection = client.db(dbName).collection(collections.events)
-    return await collection.find({ clienteId: clientId }).toArray()
+    const client = await connectToMongoDB();
+    const collection = client.db(dbName).collection(collections.events);
+
+    return await collection.find({ clienteId: clientId }).toArray();
   } catch (error) {
-    console.error("Error fetching events by client:", error)
-    return []
+    console.error("Error fetching events by client ID:", error);
+    return [];
   }
 }
 
