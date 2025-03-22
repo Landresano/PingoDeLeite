@@ -42,6 +42,7 @@
     "cmdk": "^0.2.0",
     "date-fns": "^2.30.0",
     "embla-carousel-react": "^8.0.0-rc14",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.292.0",
     "mongodb": "^6.15.0",
     "next": "^14.2.25",
@@ -57,6 +58,7 @@
     "yarn": "^1.22.22"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
