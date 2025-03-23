@@ -3,27 +3,26 @@ import { fetchEventsFromDB, createEventInDB } from "../mongodb/actions"
 
 export async function GET() {
   try {
-    const events = await fetchEventsFromDB()
-    return NextResponse.json(events)
+    const eventos = await fetchEventsFromDB()
+    return NextResponse.json(eventos)
   } catch (error) {
-    console.error("Error fetching events:", error)
-    return NextResponse.json({ error: "Failed to fetch events" }, { status: 500 })
+    console.error("Erro ao buscar eventos:", error)
+    return NextResponse.json({ error: "Falha ao buscar eventos" }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const eventData = await request.json()
-    const newEvent = await createEventInDB(eventData)
+    const dadosEvento = await request.json()
+    const novoEvento = await createEventInDB(dadosEvento)
 
-    if (!newEvent) {
-      return NextResponse.json({ error: "Failed to create event" }, { status: 500 })
+    if (!novoEvento) {
+      return NextResponse.json({ error: "Falha ao criar evento" }, { status: 500 })
     }
 
-    return NextResponse.json(newEvent, { status: 201 })
+    return NextResponse.json(novoEvento, { status: 201 })
   } catch (error) {
-    console.error("Error creating event:", error)
-    return NextResponse.json({ error: "Failed to create event" }, { status: 500 })
+    console.error("Erro ao criar evento:", error)
+    return NextResponse.json({ error: "Falha ao criar evento" }, { status: 500 })
   }
 }
-

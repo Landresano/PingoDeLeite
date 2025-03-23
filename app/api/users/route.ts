@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const users = await fetchUsersFromDB()
 
-    // Remove passwords before sending to client
+    // Remove senhas antes de enviar para o cliente
     const safeUsers = users.map((user) => {
       const { password, ...safeUser } = user
       return safeUser
@@ -13,8 +13,8 @@ export async function GET() {
 
     return NextResponse.json(safeUsers)
   } catch (error) {
-    console.error("Error fetching users:", error)
-    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 })
+    console.error("Erro ao buscar usuários:", error)
+    return NextResponse.json({ error: "Falha ao buscar usuários" }, { status: 500 })
   }
 }
 
@@ -22,25 +22,24 @@ export async function POST(request: Request) {
   try {
     const userData = await request.json()
 
-    // Check if user with this email already exists
+    // Verificar se já existe um usuário com este email
     const existingUser = await fetchUserByEmailFromDB(userData.email)
     if (existingUser) {
-      return NextResponse.json({ error: "User with this email already exists" }, { status: 409 })
+      return NextResponse.json({ error: "Usuário com este email já existe" }, { status: 409 })
     }
 
-    const newUser = await createUserInDB(userData)
+    const newUser = await createUserInDB(userData) as { password: string; [key: string]: any } | null
 
-    if (!newUser) {
-      return NextResponse.json({ error: "Failed to create user" }, { status: 500 })
+    if (!newUser || typeof newUser !== "object" || typeof newUser.password !== "string") {
+      return NextResponse.json({ error: "Falha ao criar usuário" }, { status: 500 })
     }
 
-    // Remove password before sending response
+    // Remover senha antes de enviar a resposta
     const { password, ...safeUser } = newUser
 
     return NextResponse.json(safeUser, { status: 201 })
   } catch (error) {
-    console.error("Error creating user:", error)
-    return NextResponse.json({ error: "Failed to create user" }, { status: 500 })
+    console.error("Erro ao criar usuário:", error)
+    return NextResponse.json({ error: "Falha ao criar usuário" }, { status: 500 })
   }
 }
-

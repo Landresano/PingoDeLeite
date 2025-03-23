@@ -1,15 +1,14 @@
 import type { ObjectId } from "mongodb"
 
 export interface User {
-  id: string
+  _id: ObjectId // Only MongoDB's _id is used
   name: string
   email: string
   password: string
-  _id?: ObjectId
 }
 
 export interface Client {
-  id: string
+  _id: ObjectId // Only MongoDB's _id is used
   nome: string
   cpfCnpj?: string
   idade?: number
@@ -18,7 +17,6 @@ export interface Client {
   comentarios?: string
   createdAt?: string
   updatedAt?: string
-  _id?: ObjectId
 }
 
 export interface Balloon {
@@ -37,7 +35,7 @@ export interface SpecialBalloon {
 }
 
 export interface Event {
-  id: string
+  _id: ObjectId // Only MongoDB's _id is used
   data: string
   nome: string
   clienteId: string
@@ -48,22 +46,19 @@ export interface Event {
   precoTotal: number
   createdAt?: string
   updatedAt?: string
-  _id?: ObjectId
 }
 
 export interface LogEntry {
-  id: string
+  _id: ObjectId // Only MongoDB's _id is used
   userId: string
   userName: string
   action: string
   timestamp: string
   success: boolean
   details?: any
-  _id?: ObjectId
 }
 
 export interface DatabaseStatus {
   isConnected: boolean
   lastChecked: string
 }
-

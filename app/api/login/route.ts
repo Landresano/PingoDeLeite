@@ -2,24 +2,24 @@ import { NextResponse } from "next/server"
 import { getFromLocalStorage } from "@/lib/local-storage"
 
 export async function POST(request: Request) {
-  console.log("Alternative login route called with method:", request.method)
+  console.log("Rota alternativa de login chamada com o método:", request.method)
 
   try {
     const { email, password } = await request.json()
-    console.log("Alternative login attempt for email:", email)
+    console.log("Tentativa de login alternativa para o email:", email)
 
     if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
+      return NextResponse.json({ error: "Email e senha são obrigatórios" }, { status: 400 })
     }
 
     // Fallback para localStorage
     try {
-      console.log("Using localStorage authentication")
+      console.log("Usando autenticação via localStorage")
       const users = getFromLocalStorage("users") || []
       const user = users.find((u: any) => u.email === email && u.password === password)
 
       if (user) {
-        console.log("localStorage authentication successful")
+        console.log("Autenticação via localStorage bem-sucedida")
         // Remover senha antes de retornar
         const { password: _, ...safeUser } = user
 
@@ -31,14 +31,14 @@ export async function POST(request: Request) {
         })
       }
 
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 })
+      return NextResponse.json({ error: "Email ou senha inválidos" }, { status: 401 })
     } catch (localError) {
-      console.error("Error during localStorage authentication:", localError)
-      return NextResponse.json({ error: "Authentication failed" }, { status: 500 })
+      console.error("Erro durante a autenticação via localStorage:", localError)
+      return NextResponse.json({ error: "Falha na autenticação" }, { status: 500 })
     }
   } catch (error) {
-    console.error("Error during login:", error)
-    return NextResponse.json({ error: "Authentication failed" }, { status: 500 })
+    console.error("Erro durante o login:", error)
+    return NextResponse.json({ error: "Falha na autenticação" }, { status: 500 })
   }
 }
 
@@ -53,4 +53,3 @@ export async function OPTIONS() {
     },
   })
 }
-

@@ -9,8 +9,8 @@ export async function GET() {
       _id: client._id.toString(), // Convert ObjectId to string
     })))
   } catch (error) {
-    console.error("Error fetching clients:", error)
-    return NextResponse.json({ error: "Failed to fetch clients" }, { status: 500 })
+    console.error("Erro ao buscar clientes:", error)
+    return NextResponse.json({ error: "Falha ao buscar clientes" }, { status: 500 })
   }
 }
 
@@ -20,13 +20,12 @@ export async function POST(request: Request) {
     const newClient = await createClientInDB(clientData)
 
     if (!newClient) {
-      return NextResponse.json({ error: "Failed to create client" }, { status: 500 })
+      return NextResponse.json({ error: "Falha ao criar cliente" }, { status: 500 })
     }
 
     return NextResponse.json(newClient, { status: 201 })
   } catch (error) {
-    console.error("Error creating client:", error)
-    return NextResponse.json({ error: "Failed to create client" }, { status: 500 })
+    console.error("Erro ao criar cliente:", error)
+    return NextResponse.json({ error: "Falha ao criar cliente" }, { status: 500 })
   }
 }
-

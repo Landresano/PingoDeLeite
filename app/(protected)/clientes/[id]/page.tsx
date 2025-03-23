@@ -169,7 +169,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
         description: "O cliente foi excluído com sucesso",
       });
   
-      router.push("/clients");
+      router.push("/clientes");
     } catch (error) {
       console.error("Error deleting client:", error);
       const errorMsg = handleError(error, toast, "Erro ao excluir cliente");

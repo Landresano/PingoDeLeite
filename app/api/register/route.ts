@@ -3,14 +3,14 @@ import { createUserInDB } from "../mongodb/actions"
 
 export async function POST(request: Request) {
   try {
-       const userData = await request.json()
-       const newUser = await createUserInDB(userData)
-         if (!newUser) {
-            return NextResponse.json({ error: "Failed to create user" }, { status: 500 })
+       const dadosUsuario = await request.json()
+       const novoUsuario = await createUserInDB(dadosUsuario)
+         if (!novoUsuario) {
+            return NextResponse.json({ error: "Falha ao criar usuário" }, { status: 500 })
          }   
-         return NextResponse.json(newUser, { status: 201 })
+         return NextResponse.json(novoUsuario, { status: 201 })
   } catch (error) {                                                                 
-    console.error("Error creating user:", error)
-    return NextResponse.json({ error: "Failed to create user" }, { status: 500 })
+    console.error("Erro ao criar usuário:", error)
+    return NextResponse.json({ error: "Falha ao criar usuário" }, { status: 500 })
   }      
 }

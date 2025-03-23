@@ -12,56 +12,56 @@ export { dbName, collections }
 
 // Connect to MongoDB
 export async function connectToMongoDB() {
-  console.log("Attempting to connect to MongoDB with URI:", uri ? "URI exists" : "URI is empty")
+  console.log("Tentando conectar ao MongoDB com URI:", uri ? "URI existe" : "URI está vazia")
 
   if (!uri || uri.trim() === "") {
-    console.error("MongoDB URI is not defined or empty")
-    throw new Error("MongoDB URI is not defined or empty")
+    console.error("URI do MongoDB não está definida ou está vazia")
+    throw new Error("URI do MongoDB não está definida ou está vazia")
   }
 
   try {
     if (!client) {
-      console.log("Creating new MongoDB client")
+      console.log("Criando um novo cliente MongoDB")
       client = new MongoClient(uri, {
         serverApi: {
           version: ServerApiVersion.v1,
           strict: true,
           deprecationErrors: true,
         },
-        connectTimeoutMS: 5000, // 5 seconds timeout
-        socketTimeoutMS: 30000, // 30 seconds timeout
+        connectTimeoutMS: 5000, // 5 segundos de timeout
+        socketTimeoutMS: 30000, // 30 segundos de timeout
       })
 
-      console.log("Connecting to MongoDB...")
+      console.log("Conectando ao MongoDB...")
       await client.connect()
-      console.log("Connected to MongoDB successfully")
+      console.log("Conectado ao MongoDB com sucesso")
     } else {
-      console.log("Using existing MongoDB client")
+      console.log("Usando cliente MongoDB existente")
     }
     return client
   } catch (error) {
-    console.error("Failed to connect to MongoDB:", error)
+    console.error("Falha ao conectar ao MongoDB:", error)
     throw error
   }
 }
 
 // Check database connection
 export async function checkDatabaseConnection(): Promise<boolean> {
-  console.log("Checking MongoDB connection...")
+  console.log("Verificando conexão com o MongoDB...")
 
   if (!uri || uri.trim() === "") {
-    console.error("MongoDB URI is not defined or empty")
+    console.error("URI do MongoDB não está definida ou está vazia")
     return false
   }
 
   try {
     const mongoClient = await connectToMongoDB()
-    console.log("MongoDB client obtained, sending ping command...")
+    console.log("Cliente MongoDB obtido, enviando comando ping...")
     await mongoClient.db(dbName).command({ ping: 1 })
-    console.log("MongoDB connection check successful")
+    console.log("Verificação de conexão com o MongoDB bem-sucedida")
     return true
   } catch (error) {
-    console.error("MongoDB connection check failed:", error)
+    console.error("Falha na verificação de conexão com o MongoDB:", error)
     return false
   }
 }
@@ -70,15 +70,14 @@ export async function checkDatabaseConnection(): Promise<boolean> {
 export async function closeMongoDB(): Promise<void> {
   try {
     if (client) {
-      console.log("Closing MongoDB connection...")
+      console.log("Fechando conexão com o MongoDB...")
       await client.close()
       client = null
-      console.log("MongoDB connection closed")
+      console.log("Conexão com o MongoDB fechada")
     } else {
-      console.log("No MongoDB client to close")
+      console.log("Nenhum cliente MongoDB para fechar")
     }
   } catch (error) {
-    console.error("Error closing MongoDB connection:", error)
+    console.error("Erro ao fechar conexão com o MongoDB:", error)
   }
 }
-

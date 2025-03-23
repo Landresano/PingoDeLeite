@@ -26,17 +26,14 @@ export default function LoginPage() {
   const router = useRouter()
   const { toast } = useToast()
 
-  // Initialize sample data and default users on component mount
+  // Inicializar dados de amostra e usuários padrão ao montar o componente
   useEffect(() => {
     const initialize = async () => {
       try {
-        // Inicializar dados de amostra
         initializeSampleData()
-
-        // Inicializar usuários padrão
         initializeDefaultUsers()
       } catch (error) {
-        console.error("Error initializing data:", error)
+        console.error("Erro ao inicializar os dados:", error)
       }
     }
 
@@ -49,45 +46,41 @@ export default function LoginPage() {
     setErrorMessage(null)
 
     try {
-      console.log("Login attempt with:", { email, password })
+      console.log("Tentativa de login com:", { email, password })
 
       if (!email || !password) {
-        throw new Error("Email and password are required")
+        throw new Error("Email e senha são obrigatórios")
       }
 
-      // Tente o método original
       const success = await loginUser(email, password)
 
       if (success) {
-        console.log("Login successful, setting auth token")
+        console.log("Login bem-sucedido, configurando token de autenticação")
 
-        // Log the action
         try {
           await logAction("Login", toast, true, { username: email })
         } catch (logError) {
-          console.error("Error logging action:", logError)
-          // Continue even if logging fails
+          console.error("Erro ao registrar ação:", logError)
         }
 
-        console.log("Redirecting to dashboard")
-        // Usar replace em vez de push para evitar problemas com o histórico
+        console.log("Redirecionando para o painel")
         router.replace("/dashboard")
         return
       } else {
-        throw new Error("Invalid email or password")
+        throw new Error("Email ou senha inválidos")
       }
     } catch (error) {
-      const errorMsg = handleError(error, toast, "Login failed")
+      const errorMsg = handleError(error, toast, "Falha no login")
       setErrorMessage(errorMsg)
       try {
         await logAction("Login", toast, false, { username: email, error: errorMsg })
       } catch (logError) {
-        console.error("Error logging action:", logError)
+        console.error("Erro ao registrar ação:", logError)
       }
     }
-     // Tentar a rota alternativa primeiro
-     try {
-      console.log("Trying alternative login route")
+
+    try {
+      console.log("Tentando rota alternativa de login")
       const response = await fetch("/api/login", {
         method: "POST",
         headers: {
@@ -98,43 +91,38 @@ export default function LoginPage() {
         cache: "no-store",
       })
 
-      console.log("Alternative login response status:", response.status)
+      console.log("Status da resposta de login alternativa:", response.status)
 
       if (response.ok) {
         const data = await response.json()
-        console.log("Alternative login response data:", data)
+        console.log("Dados da resposta de login alternativa:", data)
 
         if (data.success) {
-          // Store auth token in localStorage
           localStorage.setItem("auth_token", data.token || "sample-token")
           localStorage.setItem("current_user", JSON.stringify(data.user))
 
-          // Log the action
           try {
             await logAction("Login", toast, true, { username: email })
           } catch (logError) {
-            console.error("Error logging action:", logError)
+            console.error("Erro ao registrar ação:", logError)
           }
 
-          console.log("Redirecting to dashboard")
-          // Usar replace em vez de push para evitar problemas com o histórico
+          console.log("Redirecionando para o painel")
           router.replace("/dashboard")
           return
         }
       } else {
-        console.error("Alternative login failed with status:", response.status)
+        console.error("Falha no login alternativo com status:", response.status)
       }
     } catch (altError) {
-      console.error("Alternative login error:", altError)
-    }
-    finally {
+      console.error("Erro no login alternativo:", altError)
+    } finally {
       setIsLoading(false)
     }
   }
 
-  // Determine if we should use email type input
   const isTestUser = email === "teste"
-  const inputType = isTestUser ? "text" : "text" // Changed to text for all users to avoid validation issues
+  const inputType = isTestUser ? "text" : "text"
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
@@ -156,17 +144,17 @@ export default function LoginPage() {
             {errorMessage && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>Erro</AlertTitle>
                 <AlertDescription>{errorMessage}</AlertDescription>
               </Alert>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Username / Email</Label>
+              <Label htmlFor="email">Usuário / Email</Label>
               <Input
                 id="email"
                 type={inputType}
-                placeholder="username or email"
+                placeholder="usuário ou email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -174,9 +162,9 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Senha</Label>
                 <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                  Forgot password?
+                  Esqueceu a senha?
                 </Link>
               </div>
               <Input
@@ -190,16 +178,16 @@ export default function LoginPage() {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Entrando..." : "Entrar"}
             </Button>
             <div className="text-center text-sm">
-              Don&apos;t have an account?{" "}
+              Não tem uma conta?{" "}
               <Link href="/signup" className="text-primary hover:underline">
-                Sign up
+                Cadastre-se
               </Link>
             </div>
             <div className="text-center text-sm text-muted-foreground">
-              Test credentials: Username: <span className="font-medium">teste</span> / Password:{" "}
+              Credenciais de teste: Usuário: <span className="font-medium">teste</span> / Senha:{" "}
               <span className="font-medium">teste</span>
             </div>
           </CardFooter>
@@ -208,4 +196,3 @@ export default function LoginPage() {
     </div>
   )
 }
-

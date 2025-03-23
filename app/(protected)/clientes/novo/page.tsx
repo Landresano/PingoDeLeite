@@ -92,7 +92,7 @@ export default function NovoClientePage() {
       });
   
       // Redirect to client list
-      router.push("/clients");
+      router.push("/clientes");
     } catch (error) {
       console.error("Error creating client:", error);
       toast({

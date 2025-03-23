@@ -30,20 +30,20 @@ export default function SignupPage() {
       // Exceção para o usuário de teste
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(email)) {
-        newErrors.email = "Please enter a valid email address"
+        newErrors.email = "Por favor, insira um endereço de e-mail válido"
       }
     }
 
     // Validar senha
     if (password) {
       if (password.length < 6) {
-        newErrors.password = "Password must be at least 6 characters long"
+        newErrors.password = "A senha deve ter pelo menos 6 caracteres"
       }
     }
 
     // Validar confirmação de senha
     if (password !== confirmPassword) {
-      newErrors.confirm = "Passwords do not match"
+      newErrors.confirm = "As senhas não coincidem"
     }
 
     setErrors(newErrors)
@@ -64,8 +64,8 @@ export default function SignupPage() {
 
       if (password !== confirmPassword) {
         toast({
-          title: "Passwords do not match",
-          description: "Please make sure your passwords match.",
+          title: "As senhas não coincidem",
+          description: "Por favor, certifique-se de que as senhas são iguais.",
           variant: "destructive",
         })
         setIsLoading(false)
@@ -76,21 +76,21 @@ export default function SignupPage() {
 
       if (success) {
         toast({
-          title: "Registration successful",
-          description: "You can now log in with your credentials.",
+          title: "Cadastro realizado com sucesso",
+          description: "Agora você pode fazer login com suas credenciais.",
         })
         router.push("/login")
       } else {
         toast({
-          title: "Registration failed",
-          description: "This email may already be in use.",
+          title: "Falha no cadastro",
+          description: "Este e-mail pode já estar em uso.",
           variant: "destructive",
         })
       }
     } catch (error) {
       toast({
-        title: "Registration failed",
-        description: "An error occurred. Please try again.",
+        title: "Falha no cadastro",
+        description: "Ocorreu um erro. Por favor, tente novamente.",
         variant: "destructive",
       })
     } finally {
@@ -102,21 +102,21 @@ export default function SignupPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-          <CardDescription>Enter your information to create an account</CardDescription>
+          <CardTitle className="text-2xl font-bold">Criar uma conta</CardTitle>
+          <CardDescription>Insira suas informações para criar uma conta</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
+              <Label htmlFor="name">Nome</Label>
+              <Input id="name" placeholder="João Silva" value={name} onChange={(e) => setName(e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="name@example.com"
+                placeholder="nome@exemplo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -124,7 +124,7 @@ export default function SignupPage() {
               {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Senha</Label>
               <Input
                 id="password"
                 type="password"
@@ -135,7 +135,7 @@ export default function SignupPage() {
               {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -148,12 +148,12 @@ export default function SignupPage() {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Create account"}
+              {isLoading ? "Criando conta..." : "Criar conta"}
             </Button>
             <div className="text-center text-sm">
-              Already have an account?{" "}
+              Já tem uma conta?{" "}
               <Link href="/login" className="text-primary hover:underline">
-                Sign in
+                Entrar
               </Link>
             </div>
           </CardFooter>
@@ -162,4 +162,3 @@ export default function SignupPage() {
     </div>
   )
 }
-

@@ -6,8 +6,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     const events = await fetchEventsByClientFromDB(params.id)
     return NextResponse.json(events)
   } catch (error) {
-    console.error(`Error fetching events for client ${params.id}:`, error)
-    return NextResponse.json({ error: "Failed to fetch events for client" }, { status: 500 })
+    console.error(`Erro ao buscar eventos para o cliente ${params.id}:`, error)
+    return NextResponse.json({ error: "Falha ao buscar eventos para o cliente" }, { status: 500 })
   }
 }
-

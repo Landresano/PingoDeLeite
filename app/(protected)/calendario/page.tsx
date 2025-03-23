@@ -189,7 +189,7 @@ export default function CalendarioPage() {
                   today: "bg-accent text-accent-foreground",
                 }}
                 components={{
-                  Day: ({ day, ...props }) => {
+                  Day: ({ date: day, ...props }: { date: Date | undefined }) => {
                     // Handle undefined day case
                     if (!day) {
                       return (

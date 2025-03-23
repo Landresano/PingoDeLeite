@@ -25,13 +25,13 @@ export default function ForgotPasswordPage() {
       await sendPasswordResetEmail(email)
       setIsSubmitted(true)
       toast({
-        title: "Reset email sent",
-        description: "If an account exists with this email, you will receive a password reset link.",
+        title: "E-mail de redefinição enviado",
+        description: "Se existir uma conta com este e-mail, você receberá um link para redefinir sua senha.",
       })
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An error occurred. Please try again.",
+        title: "Erro",
+        description: "Ocorreu um erro. Por favor, tente novamente.",
         variant: "destructive",
       })
     } finally {
@@ -43,18 +43,18 @@ export default function ForgotPasswordPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">Reset your password</CardTitle>
-          <CardDescription>Enter your email to receive a reset link</CardDescription>
+          <CardTitle className="text-2xl font-bold">Redefina sua senha</CardTitle>
+          <CardDescription>Insira seu e-mail para receber um link de redefinição</CardDescription>
         </CardHeader>
         {!isSubmitted ? (
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">E-mail</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder="nome@exemplo.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -63,12 +63,12 @@ export default function ForgotPasswordPage() {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Sending..." : "Send reset link"}
+                {isLoading ? "Enviando..." : "Enviar link de redefinição"}
               </Button>
               <div className="text-center text-sm">
-                Remember your password?{" "}
+                Lembrou sua senha?{" "}
                 <Link href="/login" className="text-primary hover:underline">
-                  Back to login
+                  Voltar para o login
                 </Link>
               </div>
             </CardFooter>
@@ -76,11 +76,11 @@ export default function ForgotPasswordPage() {
         ) : (
           <CardContent className="space-y-4">
             <div className="rounded-lg bg-muted p-4 text-center">
-              <p className="mb-2">Reset link sent!</p>
-              <p className="text-sm text-muted-foreground">Check your email for instructions to reset your password.</p>
+              <p className="mb-2">Link de redefinição enviado!</p>
+              <p className="text-sm text-muted-foreground">Verifique seu e-mail para instruções sobre como redefinir sua senha.</p>
             </div>
             <Button asChild className="w-full">
-              <Link href="/login">Back to login</Link>
+              <Link href="/login">Voltar para o login</Link>
             </Button>
           </CardContent>
         )}
@@ -88,4 +88,3 @@ export default function ForgotPasswordPage() {
     </div>
   )
 }
-
