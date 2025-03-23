@@ -6,23 +6,22 @@ export async function GET(request: Request) {
   const email = searchParams.get("email")
 
   if (!email) {
-    return NextResponse.json({ error: "Email parameter is required" }, { status: 400 })
+    return NextResponse.json({ error: "O parâmetro de email é obrigatório" }, { status: 400 })
   }
 
   try {
     const user = await fetchUserByEmailFromDB(email)
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
+      return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
     }
 
-    // Remove password before sending response
+    // Remove a senha antes de enviar a resposta
     const { password, ...safeUser } = user
 
     return NextResponse.json(safeUser)
   } catch (error) {
-    console.error(`Error fetching user by email ${email}:`, error)
-    return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 })
+    console.error(`Erro ao buscar usuário pelo email ${email}:`, error)
+    return NextResponse.json({ error: "Falha ao buscar usuário" }, { status: 500 })
   }
 }
-

@@ -3,49 +3,46 @@ import { fetchEventsFromDB, fetchEventFromDB, updateEventInDB, deleteEventFromDB
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    const event = await fetchEventFromDB(params.id)
-    //console.log("UEPA:", params.id)
-    //const event = (await fetchEventsFromDB()).find((event) => event._id.toString() === id);
+    const evento = await fetchEventFromDB(params.id)
 
-    if (!event) {
-      return NextResponse.json({ error: "Event not found" }, { status: 404 })
+    if (!evento) {
+      return NextResponse.json({ error: "Evento não encontrado" }, { status: 404 })
     }
 
-    return NextResponse.json(event)
+    return NextResponse.json(evento)
   } catch (error) {
-    console.error(`Error fetching event ${params.id}:`, error)
-    return NextResponse.json({ error: "Failed to fetch event" }, { status: 500 })
+    console.error(`Erro ao buscar o evento ${params.id}:`, error)
+    return NextResponse.json({ error: "Falha ao buscar o evento" }, { status: 500 })
   }
 }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
-    const eventData = await request.json()
-    const updatedEvent = await updateEventInDB(params.id, eventData)
+    const dadosEvento = await request.json()
+    const eventoAtualizado = await updateEventInDB(params.id, dadosEvento)
 
-    if (!updatedEvent) {
-      return NextResponse.json({ error: "Event not found or update failed" }, { status: 404 })
+    if (!eventoAtualizado) {
+      return NextResponse.json({ error: "Evento não encontrado ou atualização falhou" }, { status: 404 })
     }
 
-    return NextResponse.json(updatedEvent)
+    return NextResponse.json(eventoAtualizado)
   } catch (error) {
-    console.error(`Error updating event ${params.id}:`, error)
-    return NextResponse.json({ error: "Failed to update event" }, { status: 500 })
+    console.error(`Erro ao atualizar o evento ${params.id}:`, error)
+    return NextResponse.json({ error: "Falha ao atualizar o evento" }, { status: 500 })
   }
 }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
-    const success = await deleteEventFromDB(params.id)
+    const sucesso = await deleteEventFromDB(params.id)
 
-    if (!success) {
-      return NextResponse.json({ error: "Event not found or delete failed" }, { status: 404 })
+    if (!sucesso) {
+      return NextResponse.json({ error: "Evento não encontrado ou exclusão falhou" }, { status: 404 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error(`Error deleting event ${params.id}:`, error)
-    return NextResponse.json({ error: "Failed to delete event" }, { status: 500 })
+    console.error(`Erro ao excluir o evento ${params.id}:`, error)
+    return NextResponse.json({ error: "Falha ao excluir o evento" }, { status: 500 })
   }
 }
-

@@ -6,10 +6,9 @@ export async function POST(request: Request) {
     const sampleData = await request.json()
     const success = await initializeSampleDataInDB(sampleData)
 
-    return NextResponse.json({ success })
+    return NextResponse.json({ sucesso: success })
   } catch (error) {
-    console.error("Error initializing sample data:", error)
-    return NextResponse.json({ error: "Failed to initialize sample data" }, { status: 500 })
+    console.error("Erro ao inicializar os dados de exemplo:", error)
+    return NextResponse.json({ erro: "Falha ao inicializar os dados de exemplo" }, { status: 500 })
   }
 }
-

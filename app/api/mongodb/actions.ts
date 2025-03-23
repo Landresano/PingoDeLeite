@@ -8,19 +8,19 @@ import { ObjectId } from "mongodb";
 import { Handlee } from "next/font/google";
 import { handleError } from "@/lib/error-handler";
 
-// Fetch all clients
+// Buscar todos os clientes
 export async function fetchClientsFromDB() {
   try {
     const client = await connectToMongoDB();
     const collection = client.db(dbName).collection(collections.clients);
     return await collection.find({}).toArray();
   } catch (error) {
-    console.error("Error fetching clients:", error)
+    console.error("Erro ao buscar clientes:", error)
     return []
   }
 }
 
-// Fetch client by ID
+// Buscar cliente por ID
 export async function fetchClientFromDB(id: string) {
   try {
     const client = await connectToMongoDB();
@@ -28,12 +28,12 @@ export async function fetchClientFromDB(id: string) {
     const foundClient = await collection.findOne({ _id: new ObjectId(id) });
     return foundClient ? { ...foundClient, _id: foundClient._id.toString() } : null;
   } catch (error) {
-    console.error("Error fetching client by ID:", error);
+    console.error("Erro ao buscar cliente por ID:", error);
     return null;
   }
 }
 
-// Create client
+// Criar cliente
 export async function createClientInDB(clientData: any) {
   try {
     const client = await connectToMongoDB()
@@ -41,12 +41,12 @@ export async function createClientInDB(clientData: any) {
     const result = await collection.insertOne(clientData)
     return { ...clientData, _id: result.insertedId }
   } catch (error) {
-    console.error("Error creating client:", error)
+    console.error("Erro ao criar cliente:", error)
     return null
   }
 }
 
-// Update client
+// Atualizar cliente
 export async function updateClientInDB(id: string, clientData: any) {
   try {
     const client = await connectToMongoDB();
@@ -55,12 +55,12 @@ export async function updateClientInDB(id: string, clientData: any) {
     const result = await collection.updateOne({ _id: new ObjectId(id) }, { $set: clientData });
     return result.modifiedCount > 0;
   } catch (error) {
-    console.error("Error updating client:", error);
+    console.error("Erro ao atualizar cliente:", error);
     return false;
   }
 }
 
-// Delete client
+// Deletar cliente
 export async function deleteClientFromDB(id: string) {
   try {
     const client = await connectToMongoDB();
@@ -69,49 +69,49 @@ export async function deleteClientFromDB(id: string) {
     const result = await collection.deleteOne({ _id: new ObjectId(id) });
     return result.deletedCount > 0;
   } catch (error) {
-    console.error("Error deleting client:", error);
+    console.error("Erro ao deletar cliente:", error);
     return false;
   }
 }
 
-// Fetch all events
+// Buscar todos os eventos
 export async function fetchEventsFromDB() {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.events)
     return await collection.find({}).toArray()
   } catch (error) {
-    console.error("Error fetching events:", error)
+    console.error("Erro ao buscar eventos:", error)
     return []
   }
 }
 
-// Fetch event by ID
+// Buscar evento por ID
 export async function fetchEventFromDB(id: string) {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.events)
     return await collection.findOne({ id })
   } catch (error) {
-    console.error("Error fetching event:", error)
+    console.error("Erro ao buscar evento:", error)
     return null
   }
 }
 
-// Fetch events by client ID
+// Buscar eventos por ID do cliente
 export async function fetchEventsByClientFromDB(clientId: string) {
   try {
     const client = await connectToMongoDB();
     const collection = client.db(dbName).collection(collections.events);
-
-    return await collection.find({ clienteId: clientId }).toArray();
+    const events = await collection.find({ clienteId: clientId }).toArray();
+    return events;
   } catch (error) {
-    console.error("Error fetching events by client ID:", error);
+    console.error("Erro ao buscar eventos por cliente:", error);
     return [];
   }
 }
 
-// Create event
+// Criar evento
 export async function createEventInDB(eventData: any) {
   try {
     const client = await connectToMongoDB()
@@ -119,95 +119,83 @@ export async function createEventInDB(eventData: any) {
     const result = await collection.insertOne(eventData)
     return { ...eventData, _id: result.insertedId }
   } catch (error) {
-    console.error("Error creating event:", error)
+    console.error("Erro ao criar evento:", error)
     return null
   }
 }
 
-// Update event
+// Atualizar evento
 export async function updateEventInDB(id: string, eventData: any) {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.events)
-    await collection.updateOne({ id }, { $set: eventData })
-    return { ...eventData, id }
+    const result = await collection.updateOne({ _id: new ObjectId(id) }, { $set: eventData });
+    return result.modifiedCount > 0;
   } catch (error) {
-    console.error("Error updating event:", error)
-    return null
+    console.error("Erro ao atualizar evento:", error);
+    return false;
   }
 }
 
-// Delete event
+// Deletar evento
 export async function deleteEventFromDB(id: string) {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.events)
-    await collection.deleteOne({ id })
-    return true
+    const result = await collection.deleteOne({ _id: new ObjectId(id) });
+    return result.deletedCount > 0;
   } catch (error) {
-    console.error("Error deleting event:", error)
-    return false
+    console.error("Erro ao deletar evento:", error);
+    return false;
   }
 }
 
-// Fetch users
+// Buscar usuários
 export async function fetchUsersFromDB() {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.users)
     return await collection.find({}).toArray()
   } catch (error) {
-    console.error("Error fetching users:", error)
+    console.error("Erro ao buscar usuários:", error)
     return []
   }
 }
 
-// Fetch user by email
+// Buscar usuário por email
 export async function fetchUserByEmailFromDB(email: string) {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.users)
     return await collection.findOne({ email })
   } catch (error) {
-    console.error("Error fetching user by email:", error)
+    console.error("Erro ao buscar usuário por email:", error)
     return null
   }
 }
 
-// Create user
-// export async function createUserInDB(userData: any) {
-//   try {
-//     const client = await connectToMongoDB()
-//     const collection = client.db(dbName).collection(collections.users)
-//     const result = await collection.insertOne(userData)
-//     return { ...userData, _id: result.insertedId }
-//   } catch (error) {
-//     console.error("Error creating user:", error)
-//     return null
-//   }
-// }
+// Criar usuário
 export async function createUserInDB(userData: any) {
   try {
     const client = await connectToMongoDB()
     const existingUser = await client.db(dbName).collection(collections.users).findOne({ email: userData.email });
 
     if (existingUser) {
-      return NextResponse.json({ error: "Email already in use" }, { status: 400 });
+      return NextResponse.json({ error: "Email já está em uso" }, { status: 400 });
     }
     else {
       const hashedPassword = await bcrypt.hash(userData.password, 10);
       userData.password = hashedPassword;
       const result = await client.db(dbName).collection(collections.users).insertOne(userData);
-      return NextResponse.json({ message: "User registered successfully" }, { status: 201 });
+      return NextResponse.json({ message: "Usuário registrado com sucesso" }, { status: 201 });
     }
   } catch (error) {
-    console.error("Error creating user:", error)
+    console.error("Erro ao criar usuário:", error)
     return null
   }
 }
 
-
-// Create log
+// Criar log
 export async function createLogInDB(logData: any) {
   try {
     const client = await connectToMongoDB()
@@ -215,40 +203,39 @@ export async function createLogInDB(logData: any) {
     const result = await collection.insertOne(logData)
     return { ...logData, _id: result.insertedId }
   } catch (error) {
-    console.error("Error creating log:", error)
+    console.error("Erro ao criar log:", error)
     return null
   }
 }
 
-// Initialize database with sample data
+// Inicializar banco de dados com dados de exemplo
 export async function initializeSampleDataInDB(sampleData: any) {
   try {
     const client = await connectToMongoDB()
     const db = client.db(dbName)
 
-    // Check if collections are empty
+    // Verificar se as coleções estão vazias
     const clientsCount = await db.collection(collections.clients).countDocuments()
     if (clientsCount === 0 && sampleData.clients && sampleData.clients.length > 0) {
       await db.collection(collections.clients).insertMany(sampleData.clients)
-      console.log(`Initialized ${sampleData.clients.length} sample clients`)
+      console.log(`Inicializado ${sampleData.clients.length} clientes de exemplo`)
     }
 
     const eventsCount = await db.collection(collections.events).countDocuments()
     if (eventsCount === 0 && sampleData.events && sampleData.events.length > 0) {
       await db.collection(collections.events).insertMany(sampleData.events)
-      console.log(`Initialized ${sampleData.events.length} sample events`)
+      console.log(`Inicializado ${sampleData.events.length} eventos de exemplo`)
     }
 
     const usersCount = await db.collection(collections.users).countDocuments()
     if (usersCount === 0 && sampleData.users && sampleData.users.length > 0) {
       await db.collection(collections.users).insertMany(sampleData.users)
-      console.log(`Initialized ${sampleData.users.length} sample users`)
+      console.log(`Inicializado ${sampleData.users.length} usuários de exemplo`)
     }
 
     return true
   } catch (error) {
-    console.error("Error initializing sample data in MongoDB:", error)
+    console.error("Erro ao inicializar dados de exemplo no MongoDB:", error)
     return false
   }
 }
-

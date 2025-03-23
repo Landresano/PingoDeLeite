@@ -6,13 +6,13 @@ export async function POST(request: Request) {
     const { email } = await request.json()
 
     if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 })
+      return NextResponse.json({ error: "Email é obrigatório" }, { status: 400 })
     }
 
     const user = await fetchUserByEmailFromDB(email)
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
+      return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
     }
 
     // Remove password before sending response
@@ -20,8 +20,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(safeUser)
   } catch (error) {
-    console.error("Error fetching user by email:", error)
-    return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 })
+    console.error("Erro ao buscar usuário pelo email:", error)
+    return NextResponse.json({ error: "Falha ao buscar usuário" }, { status: 500 })
   }
 }
-

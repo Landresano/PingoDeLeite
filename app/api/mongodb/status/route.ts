@@ -3,35 +3,34 @@ import { checkDatabaseConnection } from "../client"
 
 export async function GET() {
   try {
-    // Add a timeout to the database check
+    // Adicionar um timeout para a verificação do banco de dados
     const timeoutPromise = new Promise<boolean>((resolve) => {
       setTimeout(() => {
-        console.log("Database check timed out")
+        console.log("Tempo limite para verificação do banco de dados atingido")
         resolve(false)
       }, 3000)
     })
 
     const connectionPromise = checkDatabaseConnection().catch((error) => {
-      console.error("Error in checkDatabaseConnection:", error)
+      console.error("Erro em checkDatabaseConnection:", error)
       return false
     })
 
     const isConnected = await Promise.race([connectionPromise, timeoutPromise])
 
     return NextResponse.json({
-      status: isConnected ? "connected" : "disconnected",
+      status: isConnected ? "conectado" : "desconectado",
       timestamp: new Date().toISOString(),
     })
   } catch (error) {
-    console.error("Error checking MongoDB status:", error)
+    console.error("Erro ao verificar o status do MongoDB:", error)
     return NextResponse.json(
       {
-        status: "error",
-        message: "Failed to check MongoDB connection",
+        status: "erro",
+        message: "Falha ao verificar a conexão com o MongoDB",
         timestamp: new Date().toISOString(),
       },
       { status: 500 },
     )
   }
 }
-
