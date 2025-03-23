@@ -9,14 +9,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email é obrigatório" }, { status: 400 })
     }
 
-    const user = await fetchUserByEmailFromDB(email)
+    const user = await fetchUserByEmailFromDB(email) as { _id: string; password?: string; [key: string]: any } | null
 
     if (!user) {
       return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
     }
 
     // Remove password before sending response
-    const { password, ...safeUser } = user
+    const { password, ...safeUser } = user || {}
 
     return NextResponse.json(safeUser)
   } catch (error) {

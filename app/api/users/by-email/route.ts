@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     }
 
     // Remove a senha antes de enviar a resposta
-    const { password, ...safeUser } = user
+    const safeUser = user // Assuming 'user' does not have a 'password' property
 
     return NextResponse.json(safeUser)
   } catch (error) {

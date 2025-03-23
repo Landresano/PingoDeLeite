@@ -194,23 +194,23 @@ export default function CalendarioPage() {
                   today: "bg-accent text-accent-foreground",
                 }}
                 components={{
-                  Day: ({ date: day, displayMonth, ...props }: { date: Date | undefined; displayMonth?: Date }) => {
-                    // Handle undefined day case
-                    if (!day) {
+                  Day: ({ date: day, displayMonth, ...props }: { date?: Date; displayMonth?: Date }) => {
+                    // Handle undefined or invalid day case
+                    if (!day || isNaN(new Date(day).getTime())) {
                       return (
                         <div className="relative">
                           <button {...props} disabled>
                             <div className="text-muted">·</div>
                           </button>
                         </div>
-                      )
+                      );
                     }
 
                     return (
                       <div className="relative">
                         <button {...props}>{renderDayContents(day)}</button>
                       </div>
-                    )
+                    );
                   },
                 }}
               />
