@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
-import { handleError, logAction } from "@/lib/error-handler"
+import { handleError} from "@/lib/error-handler"
+import { logAction } from "@/lib/log-handler"
 import DatabaseHealthCheck from "@/components/database-health-check"
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
