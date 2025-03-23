@@ -55,7 +55,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("auth_token")
       localStorage.removeItem("current_user")
 
-      logAction("Logout", toast, true)
+      logAction("Logout", (options) => toast({ ...options, variant: (options.variant as "default" | "destructive") || "default" }), true)
 
       router.replace("/login")
     } catch (error) {
@@ -67,7 +67,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
     try {
       router.push(href)
       setIsOpen(false)
-      logAction("Navigation", toast, true, { destination: href })
+      logAction("Navigation", (options) => toast({ ...options, variant: options.variant as "default" | "destructive" | undefined }), true, { destination: href })
     } catch (error) {
       handleError(error, toast, "Navigation failed")
     }
