@@ -5,7 +5,6 @@ import { connectToMongoDB } from "./client"
 import { dbName, collections } from "./config"
 import bcrypt from "bcryptjs";
 import { ObjectId } from "mongodb";
-import { Handlee } from "next/font/google";
 import { handleError } from "@/lib/error-handler";
 
 // Buscar todos os clientes
@@ -39,7 +38,7 @@ export async function createClientInDB(clientData: any) {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.clients)
     const result = await collection.insertOne(clientData)
-    return { ...clientData, _id: result.insertedId }
+    return { ...clientData, _id: result.insertedId.toString() }
   } catch (error) {
     console.error("Erro ao criar cliente:", error)
     return null
@@ -91,7 +90,8 @@ export async function fetchEventFromDB(id: string) {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.events)
-    return await collection.findOne({ id })
+    const foundEvent = await collection.findOne({ _id: new ObjectId(id) });
+    return foundEvent ? { ...foundEvent, _id: foundEvent._id.toString() } : null;
   } catch (error) {
     console.error("Erro ao buscar evento:", error)
     return null
@@ -117,7 +117,7 @@ export async function createEventInDB(eventData: any) {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.events)
     const result = await collection.insertOne(eventData)
-    return { ...eventData, _id: result.insertedId }
+    return { ...eventData, _id: result.insertedId.toString() }
   } catch (error) {
     console.error("Erro ao criar evento:", error)
     return null
@@ -167,7 +167,8 @@ export async function fetchUserByEmailFromDB(email: string) {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.users)
-    return await collection.findOne({ email })
+    const foundUser = await collection.findOne({ email })
+    return foundUser ? { ...foundUser, _id: foundUser._id.toString() } : null;
   } catch (error) {
     console.error("Erro ao buscar usuário por email:", error)
     return null
@@ -201,7 +202,7 @@ export async function createLogInDB(logData: any) {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.logs)
     const result = await collection.insertOne(logData)
-    return { ...logData, _id: result.insertedId }
+    return { ...logData, _id: result.insertedId.toString() }
   } catch (error) {
     console.error("Erro ao criar log:", error)
     return null
