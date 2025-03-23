@@ -253,7 +253,7 @@ export default function NovoEventoPage() {
       })
 
       // Redirect to event list
-      router.push("/events")
+      router.push("/eventos")
     } catch (error) {
       console.error("Error creating event:", error)
       toast({
@@ -523,7 +523,7 @@ export default function NovoEventoPage() {
           <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="text-xl font-bold">Total: {formatCurrency(totalPrice)}</div>
             <div className="flex gap-4">
-              <Button type="button" variant="outline" onClick={() => router.push("/events")}>
+              <Button type="button" variant="outline" onClick={() => router.push("/eventos")}>
                 Cancelar
               </Button>
               <Button type="submit" disabled={isSubmitting}>

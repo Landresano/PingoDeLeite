@@ -531,7 +531,7 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
           <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="text-xl font-bold">Total: {formatCurrency(totalPrice)}</div>
             <div className="flex gap-4">
-              <Button type="button" variant="outline" onClick={() => router.push(`/events/${id}`)}>
+              <Button type="button" variant="outline" onClick={() => router.push(`/eventos/${id}`)}>
                 Cancelar
               </Button>
               <Button type="submit" disabled={isSubmitting}>
