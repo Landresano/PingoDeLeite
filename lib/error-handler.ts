@@ -1,9 +1,9 @@
-// Function to handle errors consistently across the application
+// Função para lidar com erros de forma consistente em toda a aplicação
 export function handleError(error: any, toast: any, customMessage?: string): string {
-  console.error("Error occurred:", error)
+  console.error("Ocorreu um erro:", error)
 
-  // Extract error message
-  let errorMessage = "An unknown error occurred"
+  // Extrair mensagem de erro
+  let errorMessage = "Ocorreu um erro desconhecido"
 
   if (typeof error === "string") {
     errorMessage = error
@@ -13,32 +13,32 @@ export function handleError(error: any, toast: any, customMessage?: string): str
     errorMessage = String(error.message)
   }
 
-  // Use custom message if provided
+  // Usar mensagem personalizada, se fornecida
   const displayMessage = customMessage || errorMessage
 
-  // Show toast notification
+  // Mostrar notificação (toast)
   if (toast) {
     try {
       toast({
-        title: "Error",
+        title: "Erro",
         description: displayMessage,
         variant: "destructive",
       })
     } catch (toastError) {
-      console.error("Error showing toast:", toastError)
+      console.error("Erro ao exibir notificação:", toastError)
     }
   }
 
   return displayMessage
 }
 
-// Function to log actions and provide feedback
+// Função para registrar ações e fornecer feedback
 export async function logAction(action: string, toast: any, success = true, details?: any): Promise<void> {
   const timestamp = new Date().toISOString()
 
-  // Get current user
-  let userId = "unknown"
-  let userName = "unknown"
+  // Obter usuário atual
+  let userId = "desconhecido"
+  let userName = "desconhecido"
 
   try {
     const userJson = localStorage.getItem("current_user")
@@ -48,7 +48,7 @@ export async function logAction(action: string, toast: any, success = true, deta
       userName = user.name
     }
   } catch (error) {
-    console.error("Error getting current user for logging:", error)
+    console.error("Erro ao obter usuário atual para registro:", error)
   }
 
   const logEntry = {
@@ -61,18 +61,18 @@ export async function logAction(action: string, toast: any, success = true, deta
     details,
   }
 
-  console.log("Action log:", logEntry)
+  console.log("Registro de ação:", logEntry)
 
-  // Store in localStorage first
+  // Armazenar no localStorage primeiro
   try {
     const logs = JSON.parse(localStorage.getItem("action_logs") || "[]")
     logs.unshift(logEntry)
-    localStorage.setItem("action_logs", JSON.stringify(logs.slice(0, 100))) // Keep last 100 logs
+    localStorage.setItem("action_logs", JSON.stringify(logs.slice(0, 100))) // Manter os últimos 100 registros
   } catch (localError) {
-    console.error("Failed to save action log to localStorage:", localError)
+    console.error("Falha ao salvar registro de ação no localStorage:", localError)
   }
 
-  // Try to store in MongoDB via API
+  // Tentar armazenar no MongoDB via API
   try {
     const response = await fetch("/api/logs", {
       method: "POST",
@@ -82,30 +82,29 @@ export async function logAction(action: string, toast: any, success = true, deta
     })
 
     if (!response.ok) {
-      console.error("Failed to save action log to API:", response.status)
+      console.error("Falha ao salvar registro de ação na API:", response.status)
     }
   } catch (apiError) {
-    console.error("Failed to save action log to API:", apiError)
+    console.error("Falha ao salvar registro de ação na API:", apiError)
   }
 
-  // Show feedback toast
+  // Mostrar notificação de feedback
   if (toast) {
     try {
       if (success) {
         toast({
-          title: "Success",
-          description: `${action} completed successfully`,
+          title: "Sucesso",
+          description: `${action} concluída com sucesso`,
         })
       } else {
         toast({
-          title: "Action Failed",
-          description: `Failed to ${action.toLowerCase()}. ${details?.error || ""}`,
+          title: "Ação Falhou",
+          description: `Falha ao ${action.toLowerCase()}. ${details?.error || ""}`,
           variant: "destructive",
         })
       }
     } catch (toastError) {
-      console.error("Error showing toast:", toastError)
+      console.error("Erro ao exibir notificação:", toastError)
     }
   }
 }
-
