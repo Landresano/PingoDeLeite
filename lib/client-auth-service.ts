@@ -21,32 +21,32 @@ export const sendPasswordResetEmail = async (email: string) => {
   return Promise.resolve()
 }
 
-export const initializeDefaultUsers = () => {
-  // Check if users already exist
-  const users = getFromLocalStorage("users")
+// export const initializeDefaultUsers = () => {
+//   // Check if users already exist
+//   const users = getFromLocalStorage("users")
 
-  if (!users || users.length === 0) {
-    // Create a default admin user
-    const defaultUsers = [
-      {
-        id: "1",
-        name: "Admin",
-        email: "admin@example.com",
-        password: "password",
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: "2",
-        name: "Test User",
-        email: "teste",
-        password: "teste",
-        createdAt: new Date().toISOString(),
-      },
-    ]
+//   if (!users || users.length === 0) {
+//     // Create a default admin user
+//     const defaultUsers = [
+//       {
+//         id: "1",
+//         name: "Admin",
+//         email: "admin@example.com",
+//         password: "password",
+//         createdAt: new Date().toISOString(),
+//       },
+//       {
+//         id: "2",
+//         name: "Test User",
+//         email: "teste",
+//         password: "teste",
+//         createdAt: new Date().toISOString(),
+//       },
+//     ]
 
-    saveToLocalStorage("users", defaultUsers)
-  }
-}
+//     saveToLocalStorage("users", defaultUsers)
+//   }
+// }
 
 export async function registerUser(name: string, email: string, password: string) {
   try {

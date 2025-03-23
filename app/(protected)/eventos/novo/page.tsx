@@ -196,14 +196,9 @@ export default function NovoEventoPage() {
           return []
         }
       }
-      const events = await fetchEvents()
-
-      // // Generate a unique event ID
-       const eventId = `${200000 + events.length + 1}`
 
       // Create new event object
       const newEvent = {
-        id: eventId,
         data: formData.data,
         nome: formData.nome.trim(),
         clienteId: formData.clienteId,
@@ -239,7 +234,6 @@ export default function NovoEventoPage() {
 
       // Log the action
       logAction("create_event", {
-        eventId: newEvent.id,
         eventName: newEvent.nome,
         clientId: newEvent.clienteId,
         clientName: newEvent.clienteNome,

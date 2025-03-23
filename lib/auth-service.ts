@@ -2,7 +2,7 @@
 
 // Todas as funções em arquivos com 'use server' devem ser assíncronas
 import { cookies } from "next/headers";
-import { fetchUserByEmailFromDB } from "@/app/actions"; // Adjusted to use absolute path alias
+import { fetchUserByEmailFromDB  } from "@/app/actions"; // Adjusted to use absolute path alias
 import jwt from "jsonwebtoken"; // If using JWT for authentication
 
 export const getCurrentUser = async () => {
@@ -36,6 +36,8 @@ export const getCurrentUser = async () => {
   }
 };
 
+
+
 export const sendPasswordResetEmail = async (email: string) => {
   // In a real application, this function would:
   // 1. Generate a unique password reset token.
@@ -48,11 +50,11 @@ export const sendPasswordResetEmail = async (email: string) => {
   return Promise.resolve()
 }
 
-export const initializeDefaultUsers = async () => {
-  // Como estamos em um Server Action, não podemos acessar localStorage diretamente
-  // Esta função deve ser chamada do cliente
-  return
-}
+// export const initializeDefaultUsers = async () => {
+//   // Como estamos em um Server Action, não podemos acessar localStorage diretamente
+//   // Esta função deve ser chamada do cliente
+//   return
+// }
 
 export const registerUser = async (name: string, email: string, password: string): Promise<boolean> => {
   try {

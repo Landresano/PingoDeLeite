@@ -13,8 +13,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { handleError, logAction } from "@/lib/error-handler"
-import { initializeDefaultUsers, loginUser } from "@/lib/client-auth-service"
-import { initializeSampleData } from "@/lib/db-service"
+import { loginUser } from "@/lib/client-auth-service"
+// import { initializeSampleData } from "@/lib/db-service"
 import { useDatabaseHealth } from "@/components/database-health-check"
 
 export default function LoginPage() {
@@ -26,19 +26,19 @@ export default function LoginPage() {
   const router = useRouter()
   const { toast } = useToast()
 
-  // Inicializar dados de amostra e usuários padrão ao montar o componente
-  useEffect(() => {
-    const initialize = async () => {
-      try {
-        initializeSampleData()
-        initializeDefaultUsers()
-      } catch (error) {
-        console.error("Erro ao inicializar os dados:", error)
-      }
-    }
+  // // Inicializar dados de amostra e usuários padrão ao montar o componente
+  // useEffect(() => {
+  //   const initialize = async () => {
+  //     try {
+  //       initializeSampleData()
+  //       initializeDefaultUsers()
+  //     } catch (error) {
+  //       console.error("Erro ao inicializar os dados:", error)
+  //     }
+  //   }
 
-    initialize()
-  }, [])
+  //   initialize()
+  // }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
