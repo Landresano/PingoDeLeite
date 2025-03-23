@@ -58,7 +58,7 @@ export default function LoginPage() {
         console.log("Login bem-sucedido, configurando token de autenticação")
 
         try {
-          await logAction("Login", toast, true, { username: email })
+          await logAction("Login", (options) => toast({ ...options, variant: options.variant as "default" | "destructive" | undefined }), true, { username: email })          
         } catch (logError) {
           console.error("Erro ao registrar ação:", logError)
         }
@@ -73,7 +73,7 @@ export default function LoginPage() {
       const errorMsg = handleError(error, toast, "Falha no login")
       setErrorMessage(errorMsg)
       try {
-        await logAction("Login", toast, false, { username: email, error: errorMsg })
+        logAction("Login", (options) => toast({ ...options, variant: options.variant as "default" | "destructive" | undefined }), true, { username: email, error: errorMsg })
       } catch (logError) {
         console.error("Erro ao registrar ação:", logError)
       }
@@ -102,7 +102,7 @@ export default function LoginPage() {
           localStorage.setItem("current_user", JSON.stringify(data.user))
 
           try {
-            await logAction("Login", toast, true, { username: email })
+            logAction("Login", (options) => toast({ ...options, variant: options.variant as "default" | "destructive" | undefined }), true, { username: email })
           } catch (logError) {
             console.error("Erro ao registrar ação:", logError)
           }

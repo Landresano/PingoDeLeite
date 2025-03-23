@@ -42,12 +42,12 @@ export default function ClientesPage() {
           setFilteredClients(response);
         }
   
-        logAction("Load Clients", toast, true, { count: response.length });
+        logAction("Load Clients", (options) => toast({title: "CClientes carregados", description: `Total: ${response.length} clientes`}), true, { count: response.length });
       } catch (err) {
         console.error("Failed to load clients from MongoDB:", err);
         const errorMsg = handleError(err, toast, "Failed to load clients from MongoDB");
         setError(errorMsg);
-        logAction("Load Clients", toast, false, { error: errorMsg });
+        logAction("Load Clients", (options) => toast({title: "CClientes carregados", description: `${errorMsg}`}), false, { error: errorMsg });
       } finally {
         setIsLoading(false);
       }
@@ -87,7 +87,7 @@ export default function ClientesPage() {
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
-    logAction("Search Clients", toast, true, { query: e.target.value })
+    logAction("Search Clients", (options) => toast({title: "Busca Clientes", description: `${e.target.value}`}), true, { query: e.target.value });
   }
 
   return (

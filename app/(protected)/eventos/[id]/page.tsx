@@ -54,7 +54,7 @@ export default function EventoDetalhesPage({ params }: { params: { id: string } 
         }
 
         setEvent(foundEvent)
-        logAction("View Event Details", toast, true, { eventId: id, eventName: foundEvent.nome })
+        logAction("View Event Details", (options) => toast({title: "Detalhes de Eventos", description: `Detalhes de ${foundEvent.nome} carregados`}), true, { eventId: id, eventName: foundEvent.nome })
       } catch (error) {
         const errorMsg = handleError(error, toast, "Erro ao carregar dados do evento")
         setError(errorMsg)
@@ -79,8 +79,7 @@ export default function EventoDetalhesPage({ params }: { params: { id: string } 
         throw new Error("Erro ao excluir evento")
       }
 
-      logAction("Delete Event", toast, true, { eventId: id, eventName: event.nome })
-
+      logAction("Delete Event", (options) => toast({title: "Evento deletado", description: `${event.nome} deletado`}), true, { eventId: id, eventName: event.nome  })
       toast({
         title: "Evento excluído",
         description: "O evento foi excluído com sucesso",

@@ -1,13 +1,13 @@
 import type { ObjectId } from "mongodb"
 
-export interface User {
+export default interface User {
   _id: ObjectId // Only MongoDB's _id is used
   name: string
   email: string
   password: string
 }
 
-export interface Client {
+export default interface Client {
   _id: ObjectId // Only MongoDB's _id is used
   nome: string
   cpfCnpj?: string
@@ -34,7 +34,7 @@ export interface SpecialBalloon {
   price: number
 }
 
-export interface Event {
+export default interface Event {
   _id: ObjectId // Only MongoDB's _id is used
   data: string
   nome: string
@@ -48,7 +48,7 @@ export interface Event {
   updatedAt?: string
 }
 
-export interface LogEntry {
+export default interface LogEntry {
   _id: ObjectId // Only MongoDB's _id is used
   userId: string
   userName: string
@@ -58,7 +58,7 @@ export interface LogEntry {
   details?: any
 }
 
-export interface DatabaseStatus {
+export default interface DatabaseStatus {
   isConnected: boolean
   lastChecked: string
 }

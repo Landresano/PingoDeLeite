@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import type Client from "@/lib/types"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -9,15 +9,7 @@ import { CalendarDays, Edit, Trash, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import {  Dialog,  DialogContent,  DialogDescription,  DialogFooter,  DialogHeader,  DialogTitle,  DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
@@ -26,7 +18,7 @@ import { useToast } from "@/hooks/use-toast"
 import { formatCurrency } from "@/lib/utils"
 import { handleError } from "@/lib/error-handler"
 import { logAction } from "@/lib/log-handler"
-import { fetchClientsFromDB, fetchClientFromDB, fetchEventsByClientFromDB, updateClientInDB, deleteClientFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
+import { fetchClientFromDB, fetchEventsByClientFromDB, updateClientInDB, deleteClientFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
 
 
 export default function ClienteDetalhesPage({ params }: { params: { id: string } }) {
@@ -58,15 +50,13 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
         console.log("Fetching client details for ID:", id);
           
         // Fetch client from MongoDB
-        //NÃO CONSEGUI FAZER FUNCIONAR POR NADA!!!! #TODO
-        //const foundClient = await fetchClientFromDB(id);
-        const foundClient = (await fetchClientsFromDB()).find((client) => client._id.toString() === id);
-        console.log("Fetched client:", foundClient);
-  
+        const foundClient: Client | null = await fetchClientFromDB(id);
         if (!foundClient) {
           throw new Error("Cliente não encontrado");
         }
-  
+        
+        console.log("Fetched client:", foundClient);
+
         setClient(foundClient);
   
         // Initialize form data
@@ -85,7 +75,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
   
         setClientEvents(clientEvents);
   
-        logAction("View Client Details", toast, true, { clientId: id, clientName: foundClient.nome });
+        logAction("View Client Details", (options) => toast({title: "Detalhes do Cliente", description: `${foundClient.nome}`}), true, { clientId: id, clientName: foundClient.nome });
       } catch (error) {
         const errorMsg = handleError(error, toast, "Erro ao carregar dados do cliente");
         setError(errorMsg);
@@ -137,7 +127,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
       setClient(updatedClient);
       setIsEditing(false);
   
-      logAction("Update Client", toast, true, { clientId: id, clientName: updatedClient.nome });
+      logAction("Update Client", (options) => toast({title: "Atualizando Cliente", description: `${updatedClient.nome}`}), true, { clientId: id, clientName: updatedClient.nome });
   
       toast({
         title: "Cliente atualizado",
@@ -163,8 +153,8 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
         throw new Error("Erro ao excluir cliente");
       }
   
-      logAction("Delete Client", toast, true, { clientId: id, clientName: client.nome });
-  
+      logAction("Delete Client", (options) => toast({title: "Removendo Cliente", description: `${client.nome}`}), true, { clientId: id, clientName: client.nome });
+
       toast({
         title: "Cliente excluído",
         description: "O cliente foi excluído com sucesso",

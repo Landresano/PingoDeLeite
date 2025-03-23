@@ -59,7 +59,8 @@ export default function CalendarioPage() {
         console.log("Event dates map:", dates)
         setEventDates(dates)
 
-        logAction("Load Calendar", toast, true, { eventCount: eventsData.length })
+        logAction("Load Calendar", (options) => toast({title: "Carregando Calendário", description: `${eventsData.length} eventos carregados`}), true, { eventCount: eventsData.length });
+
       } catch (err) {
         console.error("Calendar data loading error:", err)
         const errorMsg = handleError(err, toast, "Failed to load calendar data")
@@ -99,10 +100,8 @@ export default function CalendarioPage() {
         setSelectedDateEvents(filteredEvents)
         setIsDialogOpen(true)
 
-        logAction("View Date Events", toast, true, {
-          date: dateStr,
-          eventCount: filteredEvents.length,
-        })
+        logAction("View Date Events", (options) => toast({title: "Visualizando eventos da data", description: `${dateStr}, ${filteredEvents.length} eventos carregados`}), true, { date: dateStr, eventCount: filteredEvents.length,});
+
       } catch (err) {
         console.error("Error handling date selection:", err)
         handleError(err, toast, "Error selecting date")

@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
 import { formatCurrency } from "@/lib/utils"
-import { handleError, logAction } from "@/lib/error-handler"
+import { handleError } from "@/lib/error-handler"
+import { logAction } from "@/lib/log-handler"
 import { cn } from "@/lib/utils"
 
 export default function EventosPage() {
@@ -41,12 +42,13 @@ export default function EventosPage() {
         setEvents(eventsData)
         setFilteredEvents(eventsData)
 
-        logAction("Load Events", toast, true, { count: eventsData.length })
+        logAction("Load Events", (options) => toast({title: "Eventos carregados", description: `${eventsData.length} carregados`}), true, { count: eventsData.length})
+
       } catch (err) {
         console.error("Failed to load events:", err)
         const errorMsg = handleError(err, toast, "Failed to load events")
         setError(errorMsg)
-        logAction("Load Events", toast, false, { error: errorMsg })
+        logAction("Load Events", (options) => toast({title: "Falha no carregamento dos eventos:", description: `${errorMsg}`}), false, { error: errorMsg })
       } finally {
         setIsLoading(false)
       }
@@ -86,7 +88,7 @@ export default function EventosPage() {
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
-    logAction("Search Events", toast, true, { query: e.target.value })
+    logAction("Search Events", (options) => toast({}), true, { query: e.target.value })
   }
 
   return (

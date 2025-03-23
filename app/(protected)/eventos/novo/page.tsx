@@ -233,18 +233,11 @@ export default function NovoEventoPage() {
       await saveEventToDB(newEvent)
 
       // Log the action
-      logAction("create_event", {
-        eventName: newEvent.nome,
-        clientId: newEvent.clienteId,
-        clientName: newEvent.clienteNome,
-        before: null,
-        after: newEvent,
-      })
-
-      toast({
-        title: "Evento criado",
-        description: `Evento ${newEvent.nome} criado com sucesso`,
-      })
+      logAction("Create_Event",
+        (options) => toast({title: "Evento criado", description: `Evento ${newEvent.nome} criado com sucesso`}),
+        true, 
+        { eventName: newEvent.nome, clientId: newEvent.clienteId, clientName: newEvent.clienteNome, before: null, after: newEvent})
+      
 
       // Redirect to event list
       router.push("/eventos")

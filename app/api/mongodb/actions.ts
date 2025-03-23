@@ -5,6 +5,7 @@ import { connectToMongoDB, closeMongoDB } from "./client"
 import { dbName, collections } from "./config"
 import bcrypt from "bcryptjs";
 import { ObjectId } from "mongodb";
+import type Client from "@/lib/types"
 import { handleError } from "@/lib/error-handler";
 
 
@@ -24,12 +25,12 @@ export async function fetchClientsFromDB() {
 }
 
 // Buscar cliente por ID
-export async function fetchClientFromDB(id: string) {
+export async function fetchClientFromDB(id: string): Promise<Client | null> {
   try {
     const client = await connectToMongoDB();
     const collection = client.db(dbName).collection(collections.clients);
     const foundClient = await collection.findOne({ _id: new ObjectId(id) });
-    return foundClient ? { ...foundClient, _id: foundClient._id.toString() } : null;
+    return foundClient ? { ...foundClient } as Client : null;
   } catch (error) {
     console.error("Erro ao buscar cliente por ID:", error);
     return null;
