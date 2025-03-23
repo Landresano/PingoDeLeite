@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { getFromLocalStorage } from "@/lib/local-storage"
 import { formatCurrency } from "@/lib/utils"
 import { cn } from "@/lib/utils"
 import { RevenueProjectionChart, TopItemsChart, calculateAnalytics } from "@/components/dashboard/analytics"
@@ -14,6 +13,7 @@ import {
   ItemsNeededCard,
   MostRequestedItemCard,
 } from "@/components/dashboard/stat-cards"
+import { fetchClientsFromDB, fetchEventsFromDB } from "@/app/actions" // Import MongoDB actions
 
 export default function DashboardPage() {
   const [clients, setClients] = useState<any[]>([])
@@ -22,20 +22,28 @@ export default function DashboardPage() {
   const [analytics, setAnalytics] = useState<any>(null)
 
   useEffect(() => {
-    // Load data from local storage
-    const clientsData = getFromLocalStorage("clients") || []
-    const eventsData = getFromLocalStorage("events") || []
+    const loadData = async () => {
+      try {
+        // Load clients and events from MongoDB
+        const clientsData = await fetchClientsFromDB()
+        const eventsData = await fetchEventsFromDB()
 
-    setClients(clientsData)
-    setEvents(eventsData)
+        setClients(clientsData)
+        setEvents(eventsData)
 
-    // Calculate analytics
-    if (eventsData.length > 0) {
-      const analyticsData = calculateAnalytics(eventsData, clientsData)
-      setAnalytics(analyticsData)
+        // Calculate analytics
+        if (eventsData.length > 0) {
+          const analyticsData = calculateAnalytics(eventsData, clientsData)
+          setAnalytics(analyticsData)
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
-    setIsLoading(false)
+    loadData()
   }, [])
 
   // Calculate total revenue
@@ -58,8 +66,8 @@ export default function DashboardPage() {
   // Enrich client data with event counts and revenue
   const clientsWithStats = clients.map((client) => ({
     ...client,
-    eventCount: eventsPerClient[client.id || client._id]?.count || 0,
-    totalRevenue: eventsPerClient[client.id || client._id]?.revenue || 0,
+    eventCount: eventsPerClient[client._id]?.count || 0,
+    totalRevenue: eventsPerClient[client._id]?.revenue || 0,
   }))
 
   // Sort clients by event count (descending)
@@ -161,15 +169,15 @@ export default function DashboardPage() {
                   </tr>
                 ) : (
                   sortedClients.map((client) => (
-                    <tr key={client.id || client._id} className="border-b hover:bg-muted/50">
-                      <td className="py-3 px-2">{client.id || client._id}</td>
+                    <tr key={client._id} className="border-b hover:bg-muted/50">
+                      <td className="py-3 px-2">{client._id}</td>
                       <td className="py-3 px-2">{client.nome}</td>
                       <td className="py-3 px-2">{client.cpfCnpj}</td>
                       <td className="py-3 px-2">-</td>
                       <td className="py-3 px-2 text-center">{client.eventCount}</td>
                       <td className="py-3 px-2 text-right">{formatCurrency(client.totalRevenue)}</td>
                       <td className="py-3 px-2 text-center">
-                        <Link href={`/clientes/${client.id || client._id}`} className="text-primary hover:underline">
+                        <Link href={`/clientes/${client._id}`} className="text-primary hover:underline">
                           Detalhes
                         </Link>
                       </td>
@@ -203,13 +211,13 @@ export default function DashboardPage() {
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan={5} className="py-4 text-center">
+                    <td colSpan={6} className="py-4 text-center">
                       Carregando...
                     </td>
                   </tr>
                 ) : events.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-4 text-center">
+                    <td colSpan={6} className="py-4 text-center">
                       Nenhum evento encontrado
                     </td>
                   </tr>
@@ -220,7 +228,7 @@ export default function DashboardPage() {
                     .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime())
                     .slice(0, 5)
                     .map((event) => (
-                      <tr key={event.id} className="border-b hover:bg-muted/50">
+                      <tr key={event._id} className="border-b hover:bg-muted/50">
                         <td className="py-3 px-2">{new Date(event.data).toLocaleDateString("pt-BR")}</td>
                         <td className="py-3 px-2">{event.nome}</td>
                         <td className="py-3 px-2">{event.clienteNome}</td>
@@ -239,7 +247,7 @@ export default function DashboardPage() {
                         </td>
                         <td className="py-3 px-2 text-right">{formatCurrency(event.precoTotal)}</td>
                         <td className="py-3 px-2 text-center">
-                          <Link href={`/eventos/${event.id}`} className="text-primary hover:underline">
+                          <Link href={`/eventos/${event._id}`} className="text-primary hover:underline">
                             Detalhes
                           </Link>
                         </td>
@@ -254,4 +262,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-

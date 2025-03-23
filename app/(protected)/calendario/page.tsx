@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast"
 import { formatCurrency } from "@/lib/utils"
 import { handleError, logAction } from "@/lib/error-handler"
 import { cn } from "@/lib/utils"
+import { fetchEventsFromDB } from "@/app/actions" // Import MongoDB action
 
 export default function CalendarioPage() {
   const [events, setEvents] = useState<any[]>([])
@@ -27,43 +28,47 @@ export default function CalendarioPage() {
   const [eventDates, setEventDates] = useState<{ [key: string]: number }>({})
 
   useEffect(() => {
-    try {
-      console.log("Loading calendar data...")
+    const loadEvents = async () => {
+      try {
+        console.log("Loading calendar data...")
 
-      // Load events from local storage
-      const eventsData = JSON.parse(localStorage.getItem("events") || "[]")
-      console.log("Loaded events:", eventsData)
+        // Load events from MongoDB
+        const eventsData = await fetchEventsFromDB()
+        console.log("Loaded events:", eventsData)
 
-      setEvents(eventsData)
+        setEvents(eventsData)
 
-      // Create a map of dates with events
-      const dates: { [key: string]: number } = {}
-      eventsData.forEach((event: any) => {
-        try {
-          const eventDate = new Date(event.data)
-          if (!isNaN(eventDate.getTime())) {
-            const dateStr = eventDate.toISOString().split("T")[0]
-            dates[dateStr] = (dates[dateStr] || 0) + 1
-            console.log(`Event on ${dateStr}: ${event.nome}`)
-          } else {
-            console.error("Invalid date in event:", event)
+        // Create a map of dates with events
+        const dates: { [key: string]: number } = {}
+        eventsData.forEach((event: any) => {
+          try {
+            const eventDate = new Date(event.data)
+            if (!isNaN(eventDate.getTime())) {
+              const dateStr = eventDate.toISOString().split("T")[0]
+              dates[dateStr] = (dates[dateStr] || 0) + 1
+              console.log(`Event on ${dateStr}: ${event.nome}`)
+            } else {
+              console.error("Invalid date in event:", event)
+            }
+          } catch (err) {
+            console.error("Error processing event date:", err, event)
           }
-        } catch (err) {
-          console.error("Error processing event date:", err, event)
-        }
-      })
+        })
 
-      console.log("Event dates map:", dates)
-      setEventDates(dates)
+        console.log("Event dates map:", dates)
+        setEventDates(dates)
 
-      logAction("Load Calendar", toast, true, { eventCount: eventsData.length })
-    } catch (err) {
-      console.error("Calendar data loading error:", err)
-      const errorMsg = handleError(err, toast, "Failed to load calendar data")
-      setError(errorMsg)
-    } finally {
-      setIsLoading(false)
+        logAction("Load Calendar", toast, true, { eventCount: eventsData.length })
+      } catch (err) {
+        console.error("Calendar data loading error:", err)
+        const errorMsg = handleError(err, toast, "Failed to load calendar data")
+        setError(errorMsg)
+      } finally {
+        setIsLoading(false)
+      }
     }
+
+    loadEvents()
   }, [toast])
 
   const handleDateSelect = (date: Date | undefined) => {
@@ -189,7 +194,7 @@ export default function CalendarioPage() {
                   today: "bg-accent text-accent-foreground",
                 }}
                 components={{
-                  Day: ({ date: day, ...props }: { date: Date | undefined }) => {
+                  Day: ({ date: day, displayMonth, ...props }: { date: Date | undefined; displayMonth?: Date }) => {
                     // Handle undefined day case
                     if (!day) {
                       return (
@@ -253,7 +258,7 @@ export default function CalendarioPage() {
                   })
                   .slice(0, 5)
                   .map((event) => (
-                    <div key={event.id} className="flex justify-between items-start border-b pb-4">
+                    <div key={event._id} className="flex justify-between items-start border-b pb-4">
                       <div>
                         <h3 className="font-medium">{event.nome}</h3>
                         <p className="text-sm text-muted-foreground">
@@ -273,7 +278,7 @@ export default function CalendarioPage() {
                         <p className="text-sm">{event.clienteNome}</p>
                       </div>
                       <Button variant="link" asChild className="h-auto p-0">
-                        <Link href={`/eventos/${event.id}`}>Ver detalhes</Link>
+                        <Link href={`/eventos/${event._id}`}>Ver detalhes</Link>
                       </Button>
                     </div>
                   ))}
@@ -312,7 +317,7 @@ export default function CalendarioPage() {
           {selectedDateEvents.length > 0 && (
             <div className="space-y-4 mt-4">
               {selectedDateEvents.map((event) => (
-                <div key={event.id} className="space-y-2">
+                <div key={event._id} className="space-y-2">
                   <div className="flex justify-between items-start">
                     <h3 className="font-medium">{event.nome}</h3>
                     <span
@@ -331,7 +336,7 @@ export default function CalendarioPage() {
                   <p className="text-sm">Cliente: {event.clienteNome}</p>
                   <div className="flex justify-end">
                     <Button asChild size="sm">
-                      <Link href={`/eventos/${event.id}`}>Ver detalhes</Link>
+                      <Link href={`/eventos/${event._id}`}>Ver detalhes</Link>
                     </Button>
                   </div>
                   <Separator className="mt-2" />
@@ -344,4 +349,3 @@ export default function CalendarioPage() {
     </div>
   )
 }
-
