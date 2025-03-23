@@ -24,8 +24,9 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { formatCurrency } from "@/lib/utils"
-import { handleError, logAction } from "@/lib/error-handler"
-import { fetchClientsFromDB, fetchClientFromDB, fetchEventsByClientFromDB, updateClientInDB, deleteClientFromDB } from "@/app/actions"; 
+import { handleError } from "@/lib/error-handler"
+import { logAction } from "@/lib/log-handler"
+import { fetchClientsFromDB, fetchClientFromDB, fetchEventsByClientFromDB, updateClientInDB, deleteClientFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
 
 
 export default function ClienteDetalhesPage({ params }: { params: { id: string } }) {
@@ -415,7 +416,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
                   {clientEvents
                     .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
                     .map((event) => (
-                      <div key={event.id} className="flex justify-between items-start border-b pb-4">
+                      <div key={event._id} className="flex justify-between items-start border-b pb-4">
                         <div>
                           <h3 className="font-medium">{event.nome}</h3>
                           <p className="text-sm text-muted-foreground">

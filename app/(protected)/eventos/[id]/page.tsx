@@ -18,9 +18,10 @@ import {
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import { formatCurrency } from "@/lib/utils"
-import { handleError, logAction } from "@/lib/error-handler"
+import { handleError } from "@/lib/error-handler"
+import { logAction } from "@/lib/log-handler"
 import { cn } from "@/lib/utils"
-import { fetchEventsFromDB } from "@/app/actions"
+import { fetchEventsFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
 
 export default function EventoDetalhesPage({ params }: { params: { id: string } }) {
   const router = useRouter()

@@ -2,7 +2,7 @@
 
 // Todas as funções em arquivos com 'use server' devem ser assíncronas
 import { cookies } from "next/headers";
-import { fetchUserByEmailFromDB  } from "@/app/actions"; // Adjusted to use absolute path alias
+import { fetchUserByEmailFromDB  } from "@/app/api/mongodb/actions" // Import MongoDB actions
 import jwt from "jsonwebtoken"; // If using JWT for authentication
 
 export const getCurrentUser = async () => {
@@ -25,7 +25,7 @@ export const getCurrentUser = async () => {
 
     // Return user data, excluding sensitive info
     if (user) {
-      const { password, ...safeUser } = user;
+      const safeUser = { ...user }; // Adjusted to avoid destructuring a non-existent property
       return safeUser;
     }
 

@@ -10,8 +10,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
-import { handleError, logAction } from "@/lib/error-handler"
-import { fetchClientsFromDB } from "@/app/actions"
+import { handleError } from "@/lib/error-handler"
+import { logAction } from "@/lib/log-handler"
+import { fetchClientsFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
 
 export default function ClientesPage() {
   const [clients, setClients] = useState<any[]>([])

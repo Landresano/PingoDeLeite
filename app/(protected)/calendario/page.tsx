@@ -11,9 +11,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { formatCurrency } from "@/lib/utils"
-import { handleError, logAction } from "@/lib/error-handler"
+import { handleError } from "@/lib/error-handler"
+import { logAction } from "@/lib/log-handler"
 import { cn } from "@/lib/utils"
-import { fetchEventsFromDB } from "@/app/actions" // Import MongoDB action
+import { fetchEventsFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
 
 export default function CalendarioPage() {
   const [events, setEvents] = useState<any[]>([])

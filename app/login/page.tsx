@@ -12,9 +12,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { handleError, logAction } from "@/lib/error-handler"
+import { handleError } from "@/lib/error-handler"
+import { logAction } from "@/lib/log-handler"
 import { loginUser } from "@/lib/client-auth-service"
-// import { initializeSampleData } from "@/lib/db-service"
 import { useDatabaseHealth } from "@/components/database-health-check"
 
 export default function LoginPage() {

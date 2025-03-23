@@ -1,7 +1,7 @@
 "use server"
 
 import { NextResponse } from "next/server";
-import { connectToMongoDB } from "./client"
+import { connectToMongoDB, closeMongoDB } from "./client"
 import { dbName, collections } from "./config"
 import bcrypt from "bcryptjs";
 import { ObjectId } from "mongodb";
@@ -18,6 +18,9 @@ export async function fetchClientsFromDB() {
     console.error("Erro ao buscar clientes:", error)
     return []
   }
+  finally {
+    closeMongoDB();
+  }
 }
 
 // Buscar cliente por ID
@@ -31,6 +34,9 @@ export async function fetchClientFromDB(id: string) {
     console.error("Erro ao buscar cliente por ID:", error);
     return null;
   }
+  finally {
+    closeMongoDB();
+  }
 }
 
 // Criar cliente
@@ -43,6 +49,9 @@ export async function createClientInDB(clientData: any) {
   } catch (error) {
     console.error("Erro ao criar cliente:", error)
     return null
+  }
+  finally {
+    closeMongoDB();
   }
 }
 
@@ -58,6 +67,9 @@ export async function updateClientInDB(id: string, clientData: any) {
     console.error("Erro ao atualizar cliente:", error);
     return false;
   }
+  finally {
+    closeMongoDB();
+  }
 }
 
 // Deletar cliente
@@ -72,6 +84,9 @@ export async function deleteClientFromDB(id: string) {
     console.error("Erro ao deletar cliente:", error);
     return false;
   }
+  finally {
+    closeMongoDB();
+  }
 }
 
 // Buscar todos os eventos
@@ -83,6 +98,9 @@ export async function fetchEventsFromDB() {
   } catch (error) {
     console.error("Erro ao buscar eventos:", error)
     return []
+  }
+  finally {
+    closeMongoDB();
   }
 }
 
@@ -97,6 +115,9 @@ export async function fetchEventFromDB(id: string) {
     console.error("Erro ao buscar evento:", error)
     return null
   }
+  finally {
+    closeMongoDB();
+  }
 }
 
 // Buscar eventos por ID do cliente
@@ -109,6 +130,9 @@ export async function fetchEventsByClientFromDB(clientId: string) {
   } catch (error) {
     console.error("Erro ao buscar eventos por cliente:", error);
     return [];
+  }
+  finally {
+    closeMongoDB();
   }
 }
 
@@ -123,6 +147,9 @@ export async function createEventInDB(eventData: any) {
     console.error("Erro ao criar evento:", error)
     return null
   }
+  finally {
+    closeMongoDB();
+  }
 }
 
 // Atualizar evento
@@ -135,6 +162,9 @@ export async function updateEventInDB(id: string, eventData: any) {
   } catch (error) {
     console.error("Erro ao atualizar evento:", error);
     return false;
+  }
+  finally {
+    closeMongoDB();
   }
 }
 
@@ -149,6 +179,9 @@ export async function deleteEventFromDB(id: string) {
     console.error("Erro ao deletar evento:", error);
     return false;
   }
+  finally {
+    closeMongoDB();
+  }
 }
 
 // Buscar usuários
@@ -160,6 +193,9 @@ export async function fetchUsersFromDB() {
   } catch (error) {
     console.error("Erro ao buscar usuários:", error)
     return []
+  }
+  finally {
+    closeMongoDB();
   }
 }
 
@@ -173,6 +209,9 @@ export async function fetchUserByEmailFromDB(email: string) {
   } catch (error) {
     console.error("Erro ao buscar usuário por email:", error)
     return null
+  }
+  finally {
+    closeMongoDB();
   }
 }
 
@@ -195,6 +234,9 @@ export async function createUserInDB(userData: any) {
     console.error("Erro ao criar usuário:", error)
     return null
   }
+  finally {
+    closeMongoDB();
+  }
 }
 
 // Criar log
@@ -207,6 +249,9 @@ export async function createLogInDB(logData: any) {
   } catch (error) {
     console.error("Erro ao criar log:", error)
     return null
+  }
+  finally {
+    closeMongoDB();
   }
 }
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchUserByEmailFromDB } from "@/app/actions"; // Adjusted path based on Next.js alias
+import { fetchUserByEmailFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
@@ -12,14 +12,14 @@ export async function POST(request: Request) {
     }
 
     // Find user in MongoDB
-    const user = await fetchUserByEmailFromDB(email);
+    const user = await fetchUserByEmailFromDB(email) as { _id: string; password?: string; [key: string]: any };
 
     if (!user) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
     // Check password (hashed)
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = user.password ? await bcrypt.compare(password, user.password) : false;
         if (!isPasswordValid) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     console.log("Login successful");
 
     // Remove password before returning response
-    const { password: _, ...safeUser } = user;
+    const { password: _, ...safeUser } = user || {};
 
     return NextResponse.json({
       success: true,

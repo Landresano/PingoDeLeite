@@ -16,7 +16,7 @@ import { AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { calculateEventPrice, formatCurrency } from "@/lib/utils"
 import { handleError } from "@/lib/error-handler"
-import { fetchClientsFromDB, fetchEventsFromDB, fetchEventFromDB, updateEventInDB } from "@/app/actions" // Import MongoDB actions
+import { fetchClientsFromDB, fetchEventsFromDB, fetchEventFromDB, updateEventInDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
 
 export default function EditarEventoPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -24,7 +24,7 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
   const { id } = params
 
   const [isLoading, setIsLoading] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [clients, setClients] = useState<any[]>([])
   const [totalPrice, setTotalPrice] = useState(0)
@@ -184,9 +184,10 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
     })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const handleUpdate = async () => {
+    console.log("UEEEEEPAAAAAAA!!");
+    //e.preventDefault()
+    setIsUpdating(true)
 
     try {
       // Validate required fields
@@ -196,30 +197,31 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
           description: "O nome do evento é obrigatório",
           variant: "destructive",
         })
-        setIsSubmitting(false)
+        setIsUpdating(false)
         return
       }
-
+      console.log("UEEEEEPAAAAAAA2");
       if (!formData.clienteId) {
         toast({
           title: "Erro",
           description: "Selecione um cliente para o evento",
           variant: "destructive",
         })
-        setIsSubmitting(false)
+        setIsUpdating(false)
         return
       }
-
+      console.log("UEEEEEPAAAAAAA3");
       // Create updated event object
       const updatedEvent = {
         ...formData,
         precoTotal: totalPrice,
         updatedAt: new Date().toISOString(),
       }
-
+      console.log("UEEEEEPAAAAAAA4");
       // Update event in MongoDB
       console.log("Updating event in MongoDB:", id)
       const success = await updateEventInDB(id, updatedEvent)
+      console.log(success);
       console.log("Event updated in MongoDB:", success)
 
       if (!success) {
@@ -238,7 +240,7 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
       const errorMsg = handleError(error, toast, "Erro ao atualizar o evento")
       setError(errorMsg)
     } finally {
-      setIsSubmitting(false)
+      setIsUpdating(false)
     }
   }
 
@@ -311,7 +313,7 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
         <p className="text-muted-foreground">Edite as informações do evento</p>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form>
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
@@ -531,11 +533,11 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
           <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="text-xl font-bold">Total: {formatCurrency(totalPrice)}</div>
             <div className="flex gap-4">
-              <Button type="button" variant="outline" onClick={() => router.push(`/eventos/${id}`)}>
+            <Button type="button" variant="outline" onClick={() => router.push(`/eventos/${id}`)}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Salvando..." : "Salvar Alterações"}
+              <Button type="button" onClick={handleUpdate} disabled={isUpdating}>
+                {isUpdating ? "Salvando..." : "Salvar Alterações"}
               </Button>
             </div>
           </CardFooter>

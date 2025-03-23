@@ -13,7 +13,7 @@ import {
   ItemsNeededCard,
   MostRequestedItemCard,
 } from "@/components/dashboard/stat-cards"
-import { fetchClientsFromDB, fetchEventsFromDB } from "@/app/actions" // Import MongoDB actions
+import { fetchClientsFromDB, fetchEventsFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
 
 export default function DashboardPage() {
   const [clients, setClients] = useState<any[]>([])
