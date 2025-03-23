@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { formatCurrency } from "@/lib/utils"
 import { handleError, logAction } from "@/lib/error-handler"
-import { fetchClientFromDB, fetchEventsByClientFromDB, updateClientInDB, deleteClientFromDB } from "@/app/actions"; 
+import { fetchClientsFromDB, fetchClientFromDB, fetchEventsByClientFromDB, updateClientInDB, deleteClientFromDB } from "@/app/actions"; 
 
 
 export default function ClienteDetalhesPage({ params }: { params: { id: string } }) {
@@ -55,9 +55,11 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
       setIsLoading(true);
       try {
         console.log("Fetching client details for ID:", id);
-  
+          
         // Fetch client from MongoDB
-        const foundClient = await fetchClientFromDB(id);
+        //NÃO CONSEGUI FAZER FUNCIONAR POR NADA!!!! #TODO
+        //const foundClient = await fetchClientFromDB(id);
+        const foundClient = (await fetchClientsFromDB()).find((client) => client._id.toString() === id);
         console.log("Fetched client:", foundClient);
   
         if (!foundClient) {
@@ -423,7 +425,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
                         <div className="text-right">
                           <p className="font-medium">{formatCurrency(event.precoTotal)}</p>
                           <Button variant="link" asChild className="h-auto p-0">
-                            <Link href={`/eventos/${event.id}`}>Ver detalhes</Link>
+                            <Link href={`/eventos/${event._id}`}>Ver detalhes</Link>
                           </Button>
                         </div>
                       </div>

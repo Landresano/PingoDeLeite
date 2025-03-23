@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server"
-import { fetchEventFromDB, updateEventInDB, deleteEventFromDB } from "../../mongodb/actions"
+import { fetchEventsFromDB, fetchEventFromDB, updateEventInDB, deleteEventFromDB } from "../../mongodb/actions"
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
     const event = await fetchEventFromDB(params.id)
+    //console.log("UEPA:", params.id)
+    //const event = (await fetchEventsFromDB()).find((event) => event._id.toString() === id);
 
     if (!event) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 })

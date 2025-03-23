@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast"
 import { formatCurrency } from "@/lib/utils"
 import { handleError, logAction } from "@/lib/error-handler"
 import { cn } from "@/lib/utils"
+import { fetchEventsFromDB } from "@/app/actions"
 
 export default function EventoDetalhesPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -28,39 +29,32 @@ export default function EventoDetalhesPage({ params }: { params: { id: string } 
 
   const [event, setEvent] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchEventDetails = async () => {
-      if (typeof window === "undefined") return
-
+      setIsLoading(true)
       try {
         console.log("Loading event details for ID:", id)
 
-        // Load event data
-        const response = await fetch(`/api/eventos/${id}`)
-        if (!response.ok) throw new Error("Evento não encontrado")
 
-        const foundEvent = await response.json()
-        console.log("Found event:", foundEvent)
+        const foundEvent = (await fetchEventsFromDB()).find((event) => event._id.toString() === id);
+        // const response = await fetch(`/api/events/${id}`)
+        // if (!response.ok) throw new Error("Evento não encontrado")
+
+        // const foundEvent = await response.json()
+         console.log("Found event:", foundEvent)
 
         if (!foundEvent) {
-          const errorMsg = `Evento com ID ${id} não encontrado`
-          console.error(errorMsg)
-          setError(errorMsg)
-          toast({
-            title: "Evento não encontrado",
-            description: errorMsg,
-            variant: "destructive",
-          })
-          return
+          throw new Error(`Evento com ID ${id} não encontrado`)
         }
 
         setEvent(foundEvent)
         logAction("View Event Details", toast, true, { eventId: id, eventName: foundEvent.nome })
       } catch (error) {
-        console.error("Error loading event details:", error)
         const errorMsg = handleError(error, toast, "Erro ao carregar dados do evento")
         setError(errorMsg)
       } finally {
@@ -69,29 +63,33 @@ export default function EventoDetalhesPage({ params }: { params: { id: string } 
     }
 
     fetchEventDetails()
-  }, [id, router, toast])
+  }, [id, toast])
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    setIsDeleting(true)
     try {
-      if (typeof window === "undefined") return
-
       console.log("Deleting event:", id)
 
-      // Get all events
-      const events = JSON.parse(localStorage.getItem("events") || "[]")
-      const filteredEvents = events.filter((e: any) => e.id !== id)
+      const response = await fetch(`/api/events/${id}`, {
+        method: "DELETE",
+      })
 
-      // Save to local storage
-      localStorage.setItem("events", JSON.stringify(filteredEvents))
+      if (!response.ok) {
+        throw new Error("Erro ao excluir evento")
+      }
 
       logAction("Delete Event", toast, true, { eventId: id, eventName: event.nome })
 
-      // Redirect to event list
-      router.push("/events")
+      toast({
+        title: "Evento excluído",
+        description: "O evento foi excluído com sucesso",
+      })
+
+      router.push("/eventos")
     } catch (error) {
-      console.error("Error deleting event:", error)
       const errorMsg = handleError(error, toast, "Erro ao excluir evento")
       setError(errorMsg)
+    } finally {
       setIsDeleting(false)
     }
   }
@@ -128,7 +126,6 @@ export default function EventoDetalhesPage({ params }: { params: { id: string } 
     )
   }
 
-  // Helper function to get price description for balões especiais
   const getBalaoEspecialPriceDescription = (tipo: string, tamanho: string) => {
     switch (tipo) {
       case "Esphera":
@@ -163,7 +160,7 @@ export default function EventoDetalhesPage({ params }: { params: { id: string } 
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link href={`/eventos/editar/${event.id}`}>
+            <Link href={`/eventos/editar/${event._id}`}>
               <Edit className="mr-2 h-4 w-4" />
               Editar
             </Link>
@@ -319,4 +316,3 @@ export default function EventoDetalhesPage({ params }: { params: { id: string } 
     </div>
   )
 }
-

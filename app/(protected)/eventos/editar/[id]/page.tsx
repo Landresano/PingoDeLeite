@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Trash } from "lucide-react"
+import { Link, Plus, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Combobox } from "@/components/ui/combobox"
@@ -14,9 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { getFromLocalStorage, saveToLocalStorage, logAction } from "@/lib/local-storage"
 import { calculateEventPrice, formatCurrency } from "@/lib/utils"
 import { handleError } from "@/lib/error-handler"
+import { fetchClientsFromDB, fetchEventsFromDB, fetchEventFromDB, updateEventInDB } from "@/app/actions" // Import MongoDB actions
 
 export default function EditarEventoPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -52,60 +52,65 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
   })
 
   useEffect(() => {
-    try {
-      console.log("Loading event data for editing, ID:", id)
+    const loadData = async () => {
+      try {
+        console.log("Loading event data for editing, ID:", id)
 
-      // Load clients
-      const clientsData = getFromLocalStorage("clients") || []
-      setClients(clientsData)
+        // Load clients from MongoDB
+        const clientsData = await fetchClientsFromDB()
+        setClients(clientsData)
 
-      // Load event data
-      const events = getFromLocalStorage("events") || []
-      const event = events.find((e: any) => e.id === id)
+        // Load event data from MongoDB
+        const events = await fetchEventsFromDB();
+        console.log("Found event to edit:", events);
+        const event = (await fetchEventsFromDB()).find((event) => event._id.toString() === id);
 
-      if (!event) {
-        const errorMsg = `Evento com ID ${id} não encontrado`
-        console.error(errorMsg)
-        setError(errorMsg)
-        toast({
-          title: "Evento não encontrado",
-          description: errorMsg,
-          variant: "destructive",
+        //const event = await fetchEventFromDB(id)
+
+        if (!event) {
+          const errorMsg = `Evento com ID ${id} não encontrado`
+          console.error(errorMsg)
+          setError(errorMsg)
+          toast({
+            title: "Evento não encontrado",
+            description: errorMsg,
+            variant: "destructive",
+          })
+          return
+        }
+
+        console.log("Found event to edit:", event)
+
+        // Set form data from event
+        setFormData({
+          data: event.data.split("T")[0], // Format date for input
+          nome: event.nome,
+          clienteId: event.clienteId,
+          clienteNome: event.clienteNome,
+          status: event.status,
+          baloes: {
+            nacionalidade: event.baloes.nacionalidade,
+            customizacao: event.baloes.customizacao,
+            preenchimento: event.baloes.preenchimento,
+            metros: event.baloes.metros,
+            shine: event.baloes.shine,
+          },
+          baloesEspeciais: event.baloesEspeciais.map((balao: any) => ({
+            tipo: balao.tipo,
+            tamanho: balao.tamanho,
+            quantidade: balao.quantidade,
+          })),
         })
-        return
+      } catch (error) {
+        console.error("Error loading event for editing:", error)
+        const errorMsg = handleError(error, toast, "Erro ao carregar dados do evento")
+        setError(errorMsg)
+      } finally {
+        setIsLoading(false)
       }
-
-      console.log("Found event to edit:", event)
-
-      // Set form data from event
-      setFormData({
-        data: event.data.split("T")[0], // Format date for input
-        nome: event.nome,
-        clienteId: event.clienteId,
-        clienteNome: event.clienteNome,
-        status: event.status,
-        baloes: {
-          nacionalidade: event.baloes.nacionalidade,
-          customizacao: event.baloes.customizacao,
-          preenchimento: event.baloes.preenchimento,
-          metros: event.baloes.metros,
-          shine: event.baloes.shine,
-        },
-        baloesEspeciais: event.baloesEspeciais.map((balao: any) => ({
-          tipo: balao.tipo,
-          tamanho: balao.tamanho,
-          quantidade: balao.quantidade,
-        })),
-      })
-
-      logAction("Load Event for Edit", toast)
-    } catch (error) {
-      console.error("Error loading event for editing:", error)
-      const errorMsg = handleError(error, toast, "Erro ao carregar dados do evento")
-      setError(errorMsg)
-    } finally {
-      setIsLoading(false)
     }
+
+    loadData()
   }, [id, toast])
 
   // Calculate total price whenever form data changes
@@ -170,7 +175,7 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
   }
 
   const handleClientSelect = (clientId: string) => {
-    const selectedClient = clients.find((c) => c.id === clientId)
+    const selectedClient = clients.find((c) => c._id === clientId)
 
     setFormData({
       ...formData,
@@ -179,7 +184,7 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
@@ -205,44 +210,21 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
         return
       }
 
-      // Get existing events
-      const events = getFromLocalStorage("events") || []
-      const eventIndex = events.findIndex((e: any) => e.id === id)
-
-      if (eventIndex === -1) {
-        throw new Error(`Evento com ID ${id} não encontrado`)
-      }
-
       // Create updated event object
       const updatedEvent = {
-        ...events[eventIndex],
-        data: formData.data,
-        nome: formData.nome.trim(),
-        clienteId: formData.clienteId,
-        clienteNome: formData.clienteNome,
-        status: formData.status,
-        baloes: formData.baloes,
-        baloesEspeciais: formData.baloesEspeciais,
+        ...formData,
         precoTotal: totalPrice,
         updatedAt: new Date().toISOString(),
       }
 
-      // Update event in array
-      events[eventIndex] = updatedEvent
+      // Update event in MongoDB
+      console.log("Updating event in MongoDB:", id)
+      const success = await updateEventInDB(id, updatedEvent)
+      console.log("Event updated in MongoDB:", success)
 
-      // Save to local storage
-      saveToLocalStorage("events", events)
-
-      // Log the action
-      logAction("update_event", {
-        eventId: updatedEvent.id,
-        eventName: updatedEvent.nome,
-        clientId: updatedEvent.clienteId,
-        clientName: updatedEvent.clienteNome,
-        before: events[eventIndex],
-        after: updatedEvent,
+      if (!success) {
+        throw new Error("Erro ao atualizar o evento no banco de dados")
       }
-    )
 
       toast({
         title: "Evento atualizado",
@@ -250,7 +232,7 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
       })
 
       // Redirect to event details
-      router.push(`/events/${id}`)
+      router.push(`/eventos/${id}`)
     } catch (error) {
       console.error("Error updating event:", error)
       const errorMsg = handleError(error, toast, "Erro ao atualizar o evento")
@@ -356,10 +338,10 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
 
               <div className="space-y-2">
                 <Label htmlFor="cliente">Cliente *</Label>
-                  <Combobox
+                <Combobox
                   items={clients.map((client) => ({
                     label: client.nome,
-                    value: client.id || client._id, // Ensure unique ID (_id from MongoDB)
+                    value: client._id, // Use _id from MongoDB
                   }))}
                   value={formData.clienteId}
                   onChange={handleClientSelect}
@@ -562,7 +544,3 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
     </div>
   )
 }
-
-// Add missing Link import
-import Link from "next/link"
-

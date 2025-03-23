@@ -5,13 +5,15 @@ import { connectToMongoDB } from "./client"
 import { dbName, collections } from "./config"
 import bcrypt from "bcryptjs";
 import { ObjectId } from "mongodb";
+import { Handlee } from "next/font/google";
+import { handleError } from "@/lib/error-handler";
 
 // Fetch all clients
 export async function fetchClientsFromDB() {
   try {
-    const client = await connectToMongoDB()
-    const collection = client.db(dbName).collection(collections.clients)
-    return await collection.find({}).toArray()
+    const client = await connectToMongoDB();
+    const collection = client.db(dbName).collection(collections.clients);
+    return await collection.find({}).toArray();
   } catch (error) {
     console.error("Error fetching clients:", error)
     return []
