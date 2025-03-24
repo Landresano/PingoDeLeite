@@ -185,7 +185,6 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
   }
 
   const handleUpdate = async () => {
-    console.log("UEEEEEPAAAAAAA!!");
     //e.preventDefault()
     setIsUpdating(true)
 
@@ -200,7 +199,6 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
         setIsUpdating(false)
         return
       }
-      console.log("UEEEEEPAAAAAAA2");
       if (!formData.clienteId) {
         toast({
           title: "Erro",
@@ -210,14 +208,12 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
         setIsUpdating(false)
         return
       }
-      console.log("UEEEEEPAAAAAAA3");
       // Create updated event object
       const updatedEvent = {
         ...formData,
         precoTotal: totalPrice,
         updatedAt: new Date().toISOString(),
       }
-      console.log("UEEEEEPAAAAAAA4");
       // Update event in MongoDB
       console.log("Updating event in MongoDB:", id)
       const success = await updateEventInDB(id, updatedEvent)

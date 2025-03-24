@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import type Client from "@/lib/types"
 
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -20,8 +21,9 @@ export default function NovoEventoPage() {
   const searchParams = useSearchParams()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [clients, setClients] = useState<any[]>([])
+  const [clients, setClients] = useState<Client[]>([])
   const [totalPrice, setTotalPrice] = useState(0)
+  
   // Removed unused 'events' state
 
   // Get clientId from query params if available
@@ -49,33 +51,34 @@ export default function NovoEventoPage() {
     ],
   })
 
-  useEffect(() => {
-    const fetchClients = async () => {
+    useEffect(() => {
+      const fetchClients = async () => {
       try {
         const response = await fetch("/api/clients")
         if (!response.ok) throw new Error("Failed to fetch clients")
-  
+
         const clientsData = await response.json()
         console.log("Clients loaded:", clientsData)
-  
+
         setClients(clientsData)
-  
-        if (clientIdFromQuery) {
-          const selectedClient = clientsData.find((c: any) => c._id === clientIdFromQuery)
-          if (selectedClient) {
-            setFormData((prev) => ({
-              ...prev,
-              clienteNome: selectedClient.nome,
-            }))
-          }
-        }
       } catch (error) {
         console.error("Error fetching clients:", error)
       }
-    }
-  
-    fetchClients()
-  }, [clientIdFromQuery])
+      }
+      fetchClients()
+    }, [])
+
+    //TODO Como descobrir o que isso fazia?
+    // useEffect(() => {
+    //   if (clientIdFromQuery) {
+    //     const selectedClient = clients.find((c: any) => c._id === clientIdFromQuery)
+    //     if (selectedClient) {
+    //       setFormData((prev) => ({
+    //         ...prev,
+    //         clienteNome: selectedClient.nome,
+    //       }))
+    //     }}
+    //  }, [clientIdFromQuery, clients])
 
   // Calculate total price whenever form data changes
   useEffect(() => {
@@ -139,7 +142,7 @@ export default function NovoEventoPage() {
   }
 
   const handleClientSelect = (clientId: string) => {
-    const selectedClient = clients.find((c) => c._id === clientId)
+    const selectedClient = clients.find((c) => c._id.toString() === clientId)
   
     setFormData({
       ...formData,
@@ -320,7 +323,7 @@ export default function NovoEventoPage() {
                 <Combobox
                   items={clients.map((client) => ({
                     label: client.nome,
-                    value: client._id, // Ensure unique ID (_id from MongoDB)
+                    value: client._id.toString(), // Convert ObjectId to string
                   }))}
                   value={formData.clienteId}
                   onChange={handleClientSelect}
