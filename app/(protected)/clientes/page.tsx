@@ -176,15 +176,15 @@ export default function ClientesPage() {
                   </tr>
                 ) : (
                   filteredClients.map((client) => (
-                    <tr key={client.id || client._id} className="border-b hover:bg-muted/50">
-                      <td className="py-3 px-2">{client.id || client._id}</td>
+                    <tr key={client._id} className="border-b hover:bg-muted/50">
+                      <td className="py-3 px-2">{client._id}</td>
                       <td className="py-3 px-2">{client.nome}</td>
                       <td className="py-3 px-2">{client.cpfCnpj}</td>
                       <td className="py-3 px-2">{client.endereco}</td>
                       <td className="py-3 px-2 text-center">{client.filhos}</td>
                       <td className="py-3 px-2 text-center">
                         <Button variant="link" asChild className="h-auto p-0">
-                          <Link href={`/clientes/${client.id || client._id}`}>Detalhes</Link>
+                          <Link href={`/clientes/${client._id}`}>Detalhes</Link>
                         </Button>
                       </td>
                     </tr>

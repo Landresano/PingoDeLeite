@@ -208,7 +208,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{client.nome}</h1>
-          <p className="text-muted-foreground">Cliente #{client.id || client._id}</p>
+          <p className="text-muted-foreground">Cliente #{client._id}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
@@ -382,7 +382,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
               <div className="text-center py-4">
                 <p className="text-muted-foreground">Nenhum evento encontrado para este cliente</p>
                 <Button asChild className="mt-4">
-                  <Link href={`/eventos/novo?clienteId=${client.id || client._id}`}>
+                  <Link href={`/eventos/novo?clienteId=${client._id}`}>
                     <CalendarDays className="mr-2 h-4 w-4" />
                     Criar Novo Evento
                   </Link>
@@ -393,7 +393,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
                 <div className="flex justify-between items-center">
                   <p className="text-sm text-muted-foreground">Total de eventos: {clientEvents.length}</p>
                   <Button asChild size="sm">
-                    <Link href={`/eventos/novo?clienteId=${client.id || client._id}`}>
+                    <Link href={`/eventos/novo?clienteId=${client._id}`}>
                       <CalendarDays className="mr-2 h-4 w-4" />
                       Novo Evento
                     </Link>

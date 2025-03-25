@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { ObjectId } from "mongodb";
 import type Client from "@/lib/types"
 import type Event from "@/lib/types";
+import type User from "@/lib/types";
 import { handleError } from "@/lib/error-handler";
 
 
@@ -43,7 +44,7 @@ export async function fetchClientFromDB(id: string): Promise<Client | null> {
 }
 
 // Criar cliente
-export async function createClientInDB(clientData: any) {
+export async function createClientInDB(clientData: any): Promise<Client | null> {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.clients)
@@ -59,7 +60,7 @@ export async function createClientInDB(clientData: any) {
 }
 
 // Atualizar cliente
-export async function updateClientInDB(id: string, clientData: any) {
+export async function updateClientInDB(id: string, clientData: any): Promise<Boolean> {
   try {
     const client = await connectToMongoDB();
     const collection = client.db(dbName).collection(collections.clients);
@@ -76,7 +77,7 @@ export async function updateClientInDB(id: string, clientData: any) {
 }
 
 // Deletar cliente
-export async function deleteClientFromDB(id: string) {
+export async function deleteClientFromDB(id: string): Promise<Boolean> {
   try {
     const client = await connectToMongoDB();
     const collection = client.db(dbName).collection(collections.clients);
@@ -93,11 +94,11 @@ export async function deleteClientFromDB(id: string) {
 }
 
 // Buscar todos os eventos
-export async function fetchEventsFromDB() {
+export async function fetchEventsFromDB(): Promise<Event[]> {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.events)
-    return await collection.find({}).toArray()
+    return await collection.find({}).toArray() as Event[]
   } catch (error) {
     console.error("Erro ao buscar eventos:", error)
     return []
@@ -113,7 +114,7 @@ export async function fetchEventFromDB(id: string): Promise<Event | null> {
     const client = await connectToMongoDB();
     const collection = client.db(dbName).collection(collections.events);
     const foundEvent = await collection.findOne({ _id: new ObjectId(id) });
-    return foundEvent ? ({ ...foundEvent, _id: foundEvent._id.toString() } as unknown as Event) : null;
+    return foundEvent as Event;//? ({ ...foundEvent, _id: foundEvent._id.toString() } as unknown as Event) : null;
   } catch (error) {
     console.error("Erro ao buscar evento:", error);
     return null;
@@ -123,12 +124,12 @@ export async function fetchEventFromDB(id: string): Promise<Event | null> {
 }
 
 // Buscar eventos por ID do cliente
-export async function fetchEventsByClientFromDB(clientId: string) {
+export async function fetchEventsByClientFromDB(clientId: string): Promise<Event[]> {
   try {
     const client = await connectToMongoDB();
     const collection = client.db(dbName).collection(collections.events);
     const events = await collection.find({ clienteId: clientId }).toArray();
-    return events;
+    return events as Event[];
   } catch (error) {
     console.error("Erro ao buscar eventos por cliente:", error);
     return [];
@@ -139,12 +140,18 @@ export async function fetchEventsByClientFromDB(clientId: string) {
 }
 
 // Criar evento
-export async function createEventInDB(eventData: any) {
+export async function createEventInDB(eventData: Event): Promise<Event | null> {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.events)
-    const result = await collection.insertOne(eventData)
-    return { ...eventData, _id: result.insertedId.toString() }
+    const result = await collection.insertOne(eventData);
+    if (result.acknowledged && result.insertedId) {
+      console.log("Evento criado com sucesso:", result.insertedId);
+      return eventData;
+    } else {
+      console.error("Falha ao criar o evento.");
+      return null;
+    }
   } catch (error) {
     console.error("Erro ao criar evento:", error)
     return null
@@ -155,7 +162,7 @@ export async function createEventInDB(eventData: any) {
 }
 
 // Atualizar evento
-export async function updateEventInDB(id: string, eventData: any) {
+export async function updateEventInDB(id: string, eventData: any): Promise<Boolean>{
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.events)
@@ -171,7 +178,7 @@ export async function updateEventInDB(id: string, eventData: any) {
 }
 
 // Deletar evento
-export async function deleteEventFromDB(id: string) {
+export async function deleteEventFromDB(id: string): Promise<Boolean> {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.events)
@@ -187,11 +194,11 @@ export async function deleteEventFromDB(id: string) {
 }
 
 // Buscar usuários
-export async function fetchUsersFromDB() {
+export async function fetchUsersFromDB(): Promise<User[]> {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.users)
-    return await collection.find({}).toArray()
+    return await collection.find({}).toArray() as User[]
   } catch (error) {
     console.error("Erro ao buscar usuários:", error)
     return []
@@ -202,12 +209,12 @@ export async function fetchUsersFromDB() {
 }
 
 // Buscar usuário por email
-export async function fetchUserByEmailFromDB(email: string) {
+export async function fetchUserByEmailFromDB(email: string): Promise<User | null> {
   try {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.users)
     const foundUser = await collection.findOne({ email })
-    return foundUser ? { ...foundUser, _id: foundUser._id.toString() } : null;
+    return foundUser as User;
   } catch (error) {
     console.error("Erro ao buscar usuário por email:", error)
     return null
@@ -229,7 +236,7 @@ export async function createUserInDB(userData: any) {
     else {
       const hashedPassword = await bcrypt.hash(userData.password, 10);
       userData.password = hashedPassword;
-      const result = await client.db(dbName).collection(collections.users).insertOne(userData);
+      await client.db(dbName).collection(collections.users).insertOne(userData);
       return NextResponse.json({ message: "Usuário registrado com sucesso" }, { status: 201 });
     }
   } catch (error) {

@@ -87,7 +87,7 @@ export default function NovoClientePage() {
         }),
         true, // Indicar que foi bem-sucedido
         {
-          clientId: createdClient.id || createdClient._id,
+          clientId: createdClient._id,
           clientName: createdClient.nome,
           before: null,
           after: createdClient,
