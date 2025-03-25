@@ -1,5 +1,13 @@
 import type { ObjectId } from "mongodb"
 
+
+export enum Status {
+  CONNECTED = "conectado",
+  DISCONNECTED = "disconectado",
+  ERROR = "erro",
+}
+
+
 export default interface User {
   _id: ObjectId // Only MongoDB's _id is used
   name: string

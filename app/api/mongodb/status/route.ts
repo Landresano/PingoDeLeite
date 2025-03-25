@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { checkDatabaseConnection } from "../client"
+import { Status } from "@/lib/types"
 
 export async function GET() {
   try {
@@ -18,15 +19,17 @@ export async function GET() {
 
     const isConnected = await Promise.race([connectionPromise, timeoutPromise])
 
+
+
     return NextResponse.json({
-      status: isConnected ? "conectado" : "desconectado",
+      status: isConnected ? Status.CONNECTED : Status.DISCONNECTED,
       timestamp: new Date().toISOString(),
     })
   } catch (error) {
     console.error("Erro ao verificar o status do MongoDB:", error)
     return NextResponse.json(
       {
-        status: "erro",
+        status: Status.ERROR,
         message: "Falha ao verificar a conexão com o MongoDB",
         timestamp: new Date().toISOString(),
       },

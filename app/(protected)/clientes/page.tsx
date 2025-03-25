@@ -42,7 +42,7 @@ export default function ClientesPage() {
           setFilteredClients(response);
         }
   
-        logAction("Load Clients", (options) => toast({title: "CClientes carregados", description: `Total: ${response.length} clientes`}), true, { count: response.length });
+        logAction("Load Clients", (options) => toast({title: "CClientes carregados", description: `Total: ${response? response.length : 0} clientes`}), true, { count: response? response.length : 0 });
       } catch (err) {
         console.error("Failed to load clients from MongoDB:", err);
         const errorMsg = handleError(err, toast, "Failed to load clients from MongoDB");

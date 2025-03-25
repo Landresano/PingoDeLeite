@@ -6,15 +6,17 @@ import { dbName, collections } from "./config"
 import bcrypt from "bcryptjs";
 import { ObjectId } from "mongodb";
 import type Client from "@/lib/types"
+import type Event from "@/lib/types";
 import { handleError } from "@/lib/error-handler";
 
 
+
 // Buscar todos os clientes
-export async function fetchClientsFromDB() {
+export async function fetchClientsFromDB(): Promise<Client[] | null> {
   try {
     const client = await connectToMongoDB();
     const collection = client.db(dbName).collection(collections.clients);
-    return await collection.find({}).toArray();
+    return await collection.find({}).toArray() as Client[];
   } catch (error) {
     console.error("Erro ao buscar clientes:", error)
     return []
@@ -106,17 +108,16 @@ export async function fetchEventsFromDB() {
 }
 
 // Buscar evento por ID
-export async function fetchEventFromDB(id: string) {
+export async function fetchEventFromDB(id: string): Promise<Event | null> {
   try {
-    const client = await connectToMongoDB()
-    const collection = client.db(dbName).collection(collections.events)
+    const client = await connectToMongoDB();
+    const collection = client.db(dbName).collection(collections.events);
     const foundEvent = await collection.findOne({ _id: new ObjectId(id) });
-    return foundEvent ? { ...foundEvent, _id: foundEvent._id.toString() } : null;
+    return foundEvent ? ({ ...foundEvent, _id: foundEvent._id.toString() } as unknown as Event) : null;
   } catch (error) {
-    console.error("Erro ao buscar evento:", error)
-    return null
-  }
-  finally {
+    console.error("Erro ao buscar evento:", error);
+    return null;
+  } finally {
     closeMongoDB();
   }
 }

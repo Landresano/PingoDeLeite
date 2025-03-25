@@ -14,9 +14,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import Event from "@/lib/types"
+import Client from "@/lib/types"
 import { calculateEventPrice, formatCurrency } from "@/lib/utils"
 import { handleError } from "@/lib/error-handler"
-import { fetchClientsFromDB, fetchEventsFromDB, fetchEventFromDB, updateEventInDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
+import { fetchClientsFromDB, fetchEventsFromDB, fetchEventFromDB, updateEventInDB, fetchClientFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
 
 export default function EditarEventoPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -54,18 +56,27 @@ export default function EditarEventoPage({ params }: { params: { id: string } })
   useEffect(() => {
     const loadData = async () => {
       try {
+
         console.log("Loading event data for editing, ID:", id)
+        //Lookup event in MongoDB
+        const event = await fetchEventFromDB(id);
+        if (!event) {
+          const errorMsg = `Evento com ID ${id} não encontrado`
+          console.error(errorMsg)
+          setError(errorMsg)
+          toast({
+            title: "Evento não encontrado",
+            description: errorMsg,
+            variant: "destructive",
+          })
+          return
+        }
 
         // Load clients from MongoDB
-        const clientsData = await fetchClientsFromDB()
-        setClients(clientsData)
+        const clientData = await fetchClientsFromDB()
+        setClients(clientData || [])
 
-        // Load event data from MongoDB
-        const events = await fetchEventsFromDB();
-        console.log("Found event to edit:", events);
-        const event = (await fetchEventsFromDB()).find((event) => event._id.toString() === id);
-
-        //const event = await fetchEventFromDB(id)
+        
 
         if (!event) {
           const errorMsg = `Evento com ID ${id} não encontrado`

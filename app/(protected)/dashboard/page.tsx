@@ -28,12 +28,12 @@ export default function DashboardPage() {
         const clientsData = await fetchClientsFromDB()
         const eventsData = await fetchEventsFromDB()
 
-        setClients(clientsData)
-        setEvents(eventsData)
+        setClients(clientsData || [])
+        setEvents(eventsData || [])
 
         // Calculate analytics
         if (eventsData.length > 0) {
-          const analyticsData = calculateAnalytics(eventsData, clientsData)
+          const analyticsData = calculateAnalytics(eventsData || [], clientsData || [])
           setAnalytics(analyticsData)
         }
       } catch (error) {

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { Status } from "@/lib/types"
 
 export function useDatabaseHealth() {
   const [isConnected, setIsConnected] = useState(false)
@@ -28,14 +29,14 @@ export function useDatabaseHealth() {
 
       if (response.ok) {
         const data = await response.json()
-        setIsConnected(data.status === "connected")
+        setIsConnected(data.status === Status.CONNECTED)
         setLastChecked(data.timestamp)
 
         // Store status in localStorage for other components to access
         localStorage.setItem(
           "mongodb_status",
           JSON.stringify({
-            isConnected: data.status === "connected",
+            isConnected: data.status === Status.CONNECTED,
             lastChecked: data.timestamp,
           }),
         )
