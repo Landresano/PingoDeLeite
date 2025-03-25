@@ -15,9 +15,10 @@ import { handleError } from "@/lib/error-handler"
 import { logAction } from "@/lib/log-handler"
 import { cn } from "@/lib/utils"
 import { fetchEventsFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
+import {Event} from "@/lib/types"
 
 export default function CalendarioPage() {
-  const [events, setEvents] = useState<any[]>([])
+  const [events, setEvents] = useState<Event[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedDateEvents, setSelectedDateEvents] = useState<any[]>([])
@@ -258,7 +259,7 @@ export default function CalendarioPage() {
                   })
                   .slice(0, 5)
                   .map((event) => (
-                    <div key={event._id} className="flex justify-between items-start border-b pb-4">
+                    <div key={event._id.toString()} className="flex justify-between items-start border-b pb-4">
                       <div>
                         <h3 className="font-medium">{event.nome}</h3>
                         <p className="text-sm text-muted-foreground">

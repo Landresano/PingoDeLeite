@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-import type Client from "@/lib/types"
-
+import type {Client} from "@/lib/types"
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Plus, Trash } from "lucide-react"
