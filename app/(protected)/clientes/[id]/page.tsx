@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
-import { formatCurrency } from "@/lib/utils"
+import { formatCurrency, formataDatinhaDoMeuJeitinhoDoAmor } from "@/lib/utils"
 import { handleError } from "@/lib/error-handler"
 import { logAction } from "@/lib/log-handler"
 import { fetchClientFromDB, fetchEventsByClientFromDB, updateClientInDB, deleteClientFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
@@ -354,7 +354,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
                   </div>
                   <div>
                     <h3 className="font-medium text-sm">Cliente desde</h3>
-                    <p>{client?.createdAt ? new Date(client.createdAt).toLocaleDateString("pt-BR") : "-"}</p>
+                    <p>{client?.createdAt ? formataDatinhaDoMeuJeitinhoDoAmor(client.createdAt) : "-"}</p>
                   </div>
                 </div>
 
@@ -412,7 +412,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
                         <div>
                           <h3 className="font-medium">{event.nome}</h3>
                           <p className="text-sm text-muted-foreground">
-                            {new Date(event.data).toLocaleDateString("pt-BR")}
+                            {formataDatinhaDoMeuJeitinhoDoAmor(event.data)}
                           </p>
                         </div>
                         <div className="text-right">

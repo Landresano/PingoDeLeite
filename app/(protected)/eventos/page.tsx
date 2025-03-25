@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
-import { formatCurrency } from "@/lib/utils"
+import { formatCurrency, formataDatinhaDoMeuJeitinhoDoAmor } from "@/lib/utils"
 import { handleError } from "@/lib/error-handler"
 import { logAction } from "@/lib/log-handler"
 import { cn } from "@/lib/utils"
@@ -155,7 +155,7 @@ export default function EventosPage() {
                   filteredEvents.map((event) => (
                     <tr key={event._id} className="border-b hover:bg-muted/50">
                       <td className="py-3 px-2">
-                        {new Date(event.data).toLocaleDateString("pt-BR")}
+                        {formataDatinhaDoMeuJeitinhoDoAmor(event.data)}
                       </td>
                       <td className="py-3 px-2">{event.nome}</td>
                       <td className="py-3 px-2">{event.clienteNome}</td>

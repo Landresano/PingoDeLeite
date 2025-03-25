@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { formatCurrency } from "@/lib/utils"
+import { formatCurrency, formataDatinhaDoMeuJeitinhoDoAmor } from "@/lib/utils"
 
 export function StatCard({ title, value, description }: { title: string; value: string; description?: string }) {
   return (
@@ -49,7 +49,7 @@ export function EventPriceCard({
         <div className="flex flex-col mt-1">
           <span className="text-sm font-medium">{event.nome}</span>
           <span className="text-xs text-muted-foreground">
-            {new Date(event.data).toLocaleDateString("pt-BR")} • {event.clienteNome}
+            {formataDatinhaDoMeuJeitinhoDoAmor(event.data)} • {event.clienteNome}
           </span>
         </div>
       </CardContent>

@@ -33,6 +33,11 @@ export function formatDocument(value: string): string {
   }
 }
 
+export function formataDatinhaDoMeuJeitinhoDoAmor(value: string): string {
+  return `${value.split("-")[2]}/${value.split("-")[1]}/${value.split("-")[0]}`
+}
+
+
 export function calculateBalloonPrice(
   nationality: string,
   customization: string,

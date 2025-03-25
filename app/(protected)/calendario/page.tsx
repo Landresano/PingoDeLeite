@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { formatCurrency } from "@/lib/utils"
+import { formatCurrency, formataDatinhaDoMeuJeitinhoDoAmor } from "@/lib/utils"
 import { handleError } from "@/lib/error-handler"
 import { logAction } from "@/lib/log-handler"
 import { cn } from "@/lib/utils"
@@ -267,7 +267,7 @@ export default function CalendarioPage() {
                             try {
                               const eventDate = new Date(event.data)
                               if (!isNaN(eventDate.getTime())) {
-                                return eventDate.toLocaleDateString("pt-BR")
+                                return formataDatinhaDoMeuJeitinhoDoAmor(event.data)
                               }
                               return "Data inválida"
                             } catch (err) {

@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -17,11 +16,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
-import { formatCurrency } from "@/lib/utils"
+import { formatCurrency, formataDatinhaDoMeuJeitinhoDoAmor } from "@/lib/utils"
 import { handleError } from "@/lib/error-handler"
 import { logAction } from "@/lib/log-handler"
 import { cn } from "@/lib/utils"
 import { fetchEventsFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
+
+
 
 export default function EventoDetalhesPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -150,13 +151,13 @@ export default function EventoDetalhesPage({ params }: { params: { id: string } 
     }
     return ""
   }
-
+  
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{event.nome}</h1>
-          <p className="text-muted-foreground">{new Date(event.data).toLocaleDateString("pt-BR")}</p>
+          <p className="text-muted-foreground">{formataDatinhaDoMeuJeitinhoDoAmor(event.data)}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
@@ -203,7 +204,7 @@ export default function EventoDetalhesPage({ params }: { params: { id: string } 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <h3 className="font-medium text-sm">Data</h3>
-                <p>{new Date(event.data).toLocaleDateString("pt-BR")}</p>
+                <p>{formataDatinhaDoMeuJeitinhoDoAmor(event.data)}</p>
               </div>
               <div>
                 <h3 className="font-medium text-sm">Cliente</h3>
@@ -238,7 +239,7 @@ export default function EventoDetalhesPage({ params }: { params: { id: string } 
 
             <div>
               <h3 className="font-medium text-sm">Criado em</h3>
-              <p>{new Date(event.createdAt).toLocaleDateString("pt-BR")}</p>
+              <p>{formataDatinhaDoMeuJeitinhoDoAmor(event.createdAt)}</p>
             </div>
           </CardContent>
         </Card>

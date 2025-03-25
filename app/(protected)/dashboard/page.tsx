@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { formatCurrency } from "@/lib/utils"
-import { cn } from "@/lib/utils"
+import { formatCurrency, cn, formataDatinhaDoMeuJeitinhoDoAmor } from "@/lib/utils"
 import { RevenueProjectionChart, TopItemsChart, calculateAnalytics } from "@/components/dashboard/analytics"
 import {
   StatCard,
@@ -229,7 +228,7 @@ export default function DashboardPage() {
                     .slice(0, 5)
                     .map((event) => (
                       <tr key={event._id} className="border-b hover:bg-muted/50">
-                        <td className="py-3 px-2">{new Date(event.data).toLocaleDateString("pt-BR")}</td>
+                        <td className="py-3 px-2">{formataDatinhaDoMeuJeitinhoDoAmor(event.data)}</td>
                         <td className="py-3 px-2">{event.nome}</td>
                         <td className="py-3 px-2">{event.clienteNome}</td>
                         <td className="py-3 px-2 text-center">
