@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import type Client from "@/lib/types"
+import type {Client} from "@/lib/types"
+import type {Event} from "@/lib/types"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -19,6 +20,7 @@ import { formatCurrency } from "@/lib/utils"
 import { handleError } from "@/lib/error-handler"
 import { logAction } from "@/lib/log-handler"
 import { fetchClientFromDB, fetchEventsByClientFromDB, updateClientInDB, deleteClientFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
+import { ObjectId } from "mongodb"
 
 
 export default function ClienteDetalhesPage({ params }: { params: { id: string } }) {
@@ -26,8 +28,8 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
   const { toast } = useToast()
   const { id } = params
 
-  const [client, setClient] = useState<any>(null)
-  const [clientEvents, setClientEvents] = useState<any[]>([])
+  const [client, setClient] = useState<Client | null>(null)
+  const [clientEvents, setClientEvents] = useState<Event[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -106,15 +108,15 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
       }
   
       // Create updated client object
-      const updatedClient = {
-        ...client,
+      const updatedClient: Client = {
+        _id: client?._id || new ObjectId(), // Ensure _id is explicitly assigned and non-optional
         nome: formData.nome.trim(),
         cpfCnpj: formData.cpfCnpj,
-        idade: formData.idade ? Number.parseInt(formData.idade) : null,
+        idade: formData.idade ? Number.parseInt(formData.idade) : 0,
         endereco: formData.endereco,
         filhos: Number.parseInt(formData.filhos) || 0,
         comentarios: formData.comentarios,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
   
       // Update client in MongoDB
@@ -153,7 +155,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
         throw new Error("Erro ao excluir cliente");
       }
   
-      logAction("Delete Client", (options) => toast({title: "Removendo Cliente", description: `${client.nome}`}), true, { clientId: id, clientName: client.nome });
+      logAction("Delete Client", (options) => toast({title: "Removendo Cliente", description: `${client?.nome}`}), true, { clientId: id, clientName: client?.nome });
 
       toast({
         title: "Cliente excluído",
@@ -207,8 +209,8 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{client.nome}</h1>
-          <p className="text-muted-foreground">Cliente #{client._id}</p>
+          <h1 className="text-3xl font-bold tracking-tight">{client?.nome}</h1>
+          <p className="text-muted-foreground">Cliente #{client?._id.toString()}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
@@ -227,7 +229,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
               <DialogHeader>
                 <DialogTitle>Confirmar exclusão</DialogTitle>
                 <DialogDescription>
-                  Tem certeza que deseja excluir o cliente {client.nome}? Esta ação não pode ser desfeita.
+                  Tem certeza que deseja excluir o cliente {client?.nome}? Esta ação não pode ser desfeita.
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
@@ -332,33 +334,33 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h3 className="font-medium text-sm">CPF/CNPJ</h3>
-                    <p>{client.cpfCnpj || "-"}</p>
+                    <p>{client?.cpfCnpj || "-"}</p>
                   </div>
                   <div>
                     <h3 className="font-medium text-sm">Idade</h3>
-                    <p>{client.idade || "-"}</p>
+                    <p>{client?.idade || "-"}</p>
                   </div>
                 </div>
 
                 <div>
                   <h3 className="font-medium text-sm">Endereço</h3>
-                  <p>{client.endereco || "-"}</p>
+                  <p>{client?.endereco || "-"}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h3 className="font-medium text-sm">Filhos</h3>
-                    <p>{client.filhos || "0"}</p>
+                    <p>{client?.filhos || "0"}</p>
                   </div>
                   <div>
                     <h3 className="font-medium text-sm">Cliente desde</h3>
-                    <p>{new Date(client.createdAt).toLocaleDateString("pt-BR")}</p>
+                    <p>{client?.createdAt ? new Date(client.createdAt).toLocaleDateString("pt-BR") : "-"}</p>
                   </div>
                 </div>
 
                 <div>
                   <h3 className="font-medium text-sm">Comentários</h3>
-                  <p className="whitespace-pre-line">{client.comentarios || "-"}</p>
+                  <p className="whitespace-pre-line">{client?.comentarios || "-"}</p>
                 </div>
               </div>
             )}
@@ -382,7 +384,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
               <div className="text-center py-4">
                 <p className="text-muted-foreground">Nenhum evento encontrado para este cliente</p>
                 <Button asChild className="mt-4">
-                  <Link href={`/eventos/novo?clienteId=${client._id}`}>
+                  <Link href={`/eventos/novo?clienteId=${client?._id.toString()}`}>
                     <CalendarDays className="mr-2 h-4 w-4" />
                     Criar Novo Evento
                   </Link>
@@ -393,7 +395,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
                 <div className="flex justify-between items-center">
                   <p className="text-sm text-muted-foreground">Total de eventos: {clientEvents.length}</p>
                   <Button asChild size="sm">
-                    <Link href={`/eventos/novo?clienteId=${client._id}`}>
+                    <Link href={`/eventos/novo?clienteId=${client?._id.toString()}`}>
                       <CalendarDays className="mr-2 h-4 w-4" />
                       Novo Evento
                     </Link>
@@ -406,7 +408,7 @@ export default function ClienteDetalhesPage({ params }: { params: { id: string }
                   {clientEvents
                     .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
                     .map((event) => (
-                      <div key={event._id} className="flex justify-between items-start border-b pb-4">
+                      <div key={event._id.toString()} className="flex justify-between items-start border-b pb-4">
                         <div>
                           <h3 className="font-medium">{event.nome}</h3>
                           <p className="text-sm text-muted-foreground">

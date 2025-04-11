@@ -7,15 +7,28 @@ export enum Status {
   ERROR = "erro",
 }
 
+export interface Event {
+  _id: ObjectId // Only MongoDB's _id is used
+  data: string
+  nome: string
+  clienteId: string
+  clienteNome: string
+  status: string
+  baloes: Balloon
+  baloesEspeciais: SpecialBalloon[]
+  precoTotal: number
+  createdAt?: string
+  updatedAt?: string
+}
 
-export default interface User {
+export interface User {
   _id: ObjectId // Only MongoDB's _id is used
   name: string
   email: string
   password: string
 }
 
-export default interface Client {
+export interface Client {
   _id: ObjectId // Only MongoDB's _id is used
   nome: string
   cpfCnpj?: string
@@ -42,21 +55,7 @@ export interface SpecialBalloon {
   price: number
 }
 
-export default interface Event {
-  _id: ObjectId // Only MongoDB's _id is used
-  data: string
-  nome: string
-  clienteId: string
-  clienteNome: string
-  status: string
-  baloes: Balloon
-  baloesEspeciais: SpecialBalloon[]
-  precoTotal: number
-  createdAt?: string
-  updatedAt?: string
-}
-
-export default interface LogEntry {
+export interface LogEntry {
   _id: ObjectId // Only MongoDB's _id is used
   userId: string
   userName: string
@@ -66,7 +65,7 @@ export default interface LogEntry {
   details?: any
 }
 
-export default interface DatabaseStatus {
+export interface DatabaseStatus {
   isConnected: boolean
   lastChecked: string
 }
