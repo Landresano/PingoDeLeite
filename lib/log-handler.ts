@@ -1,4 +1,4 @@
- // Função para registrar ações e fornecer feedback
+// Função para registrar ações e fornecer feedback
 export async function logAction(
   action: string,
   showToast: (options: { title: string; description: string; variant?: string }) => void,
@@ -6,20 +6,21 @@ export async function logAction(
   details?: any
 ): Promise<void> {
   const timestamp = new Date().toISOString();
-
-  // Obter usuário atual
   let userId = "desconhecido";
   let userName = "desconhecido";
 
-  try {
-    const userJson = localStorage.getItem("current_user");
-    if (userJson) {
-      const user = JSON.parse(userJson);
-      userId = user.id;
-      userName = user.name;
+  // Obter usuário atual com try-catch mais específico
+  if (typeof window !== 'undefined') {
+    try {
+      const userJson = localStorage.getItem("current_user");
+      if (userJson) {
+        const user = JSON.parse(userJson);
+        userId = user.id;
+        userName = user.name;
+      }
+    } catch (error) {
+      console.warn("Erro ao acessar localStorage:", error);
     }
-  } catch (error) {
-    console.error("Erro ao obter usuário atual para registro:", error);
   }
 
   const logEntry = {
@@ -32,32 +33,28 @@ export async function logAction(
     details,
   };
 
-  console.log("Registro de ação:", logEntry);
-
   // Salvar no MongoDB via API
   try {
     const response = await fetch("/api/logs", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(logEntry),
-      cache: "no-store", // Evitar cache
     });
 
     if (!response.ok) {
-      console.error("Falha ao salvar registro de ação na API:", response.status);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  } catch (apiError) {
-    console.error("Falha ao salvar registro de ação na API:", apiError);
+  } catch (error) {
+    console.error("Falha ao salvar registro de ação na API:", error);
+    // Não mostrar toast de erro para falhas de log para não afetar a experiência do usuário
   }
 
-  // Mostrar notificação de feedback usando a função showToast
-  try {
-    showToast({
-      title: success ? "Sucesso" : "Ação Falhou",
-      description: success ? `${action} concluída com sucesso` : `Falha ao ${action.toLowerCase()}. ${details?.error || ""}`,
-      variant: success ? undefined : "destructive",
-    });
-  } catch (toastError) {
-    console.error("Erro ao exibir notificação:", toastError);
-  }
+  // Mostrar notificação apenas para a ação principal
+  showToast({
+    title: success ? "Sucesso" : "Ação Falhou",
+    description: success ? `${action} concluída com sucesso` : `Falha ao ${action.toLowerCase()}. ${details?.error || ""}`,
+    variant: success ? undefined : "destructive",
+  });
 }

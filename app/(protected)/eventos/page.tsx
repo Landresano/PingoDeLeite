@@ -26,29 +26,46 @@ export default function EventosPage() {
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        console.log("Loading events from MongoDB...")
+        setIsLoading(true)
+        setError(null)
 
-        const response = await fetch("/api/events") // Call API route to fetch events
-        if (!response.ok) throw new Error("Failed to fetch events")
+        const response = await fetch("/api/events", {
+          headers: {
+            'Cache-Control': 'no-store',
+          }
+        })
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
 
         const eventsData = await response.json()
         console.log("Events loaded:", eventsData)
 
         if (eventsData.length === 0) {
-          console.log("No events found")
           setError("No events found. Create your first event to get started.")
         }
 
         setEvents(eventsData)
         setFilteredEvents(eventsData)
 
-        logAction("Load Events", (options) => toast({title: "Eventos carregados", description: `${eventsData.length} carregados`}), true, { count: eventsData.length})
+        logAction("Load Events", 
+          (options) => toast({
+            title: "Eventos carregados", 
+            description: `${eventsData.length} eventos encontrados`
+          }), 
+          true, 
+          { count: eventsData.length }
+        )
 
       } catch (err) {
         console.error("Failed to load events:", err)
-        const errorMsg = handleError(err, toast, "Failed to load events")
-        setError(errorMsg)
-        logAction("Load Events", (options) => toast({title: "Falha no carregamento dos eventos:", description: `${errorMsg}`}), false, { error: errorMsg })
+        const errorMessage = err instanceof Error ? 
+          err.message : 
+          'Error accessing event data. Please try again.'
+        
+        setError(errorMessage)
+        handleError(err, toast, "Failed to load events")
       } finally {
         setIsLoading(false)
       }

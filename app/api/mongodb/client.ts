@@ -21,30 +21,53 @@ export async function connectToMongoDB() {
     throw new Error("URI do MongoDB não está definida ou está vazia");
   }
 
-  try {
-    if (!client) {
-      console.log("Criando um novo cliente MongoDB");
-      client = new MongoClient(uri, {
-        serverApi: {
-          version: ServerApiVersion.v1,
-          strict: true,
-          deprecationErrors: true,
-        },
-        connectTimeoutMS: 5000, // 5 segundos de timeout
-        socketTimeoutMS: 30000, // 30 segundos de timeout
-      });
+  const maxRetries = 3;
+  let lastError: any;
 
-      console.log("Conectando ao MongoDB...");
-      await client.connect();
-      console.log("Conectado ao MongoDB com sucesso");
-    } else {
-      console.log("Usando cliente MongoDB existente");
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      if (!client || !(await client.db().admin().ping().catch(() => false))) {
+        console.log(`Tentativa ${attempt} de ${maxRetries} para conectar ao MongoDB`);
+        client = new MongoClient(uri, {
+          serverApi: {
+            version: ServerApiVersion.v1,
+            strict: true,
+            deprecationErrors: true,
+          },
+          connectTimeoutMS: 5000,
+          socketTimeoutMS: 30000,
+        });
+
+        await client.connect();
+        // Verify connection with a ping
+        await client.db(dbName).command({ ping: 1 });
+        console.log("Conectado ao MongoDB com sucesso");
+      } else {
+        console.log("Usando cliente MongoDB existente");
+      }
+      return client;
+    } catch (error) {
+      lastError = error;
+      console.error(`Falha na tentativa ${attempt}:`, error);
+      
+      if (client) {
+        await client.close().catch(closeError => 
+          console.error("Erro ao fechar conexão:", closeError)
+        );
+        client = null;
+      }
+
+      if (attempt === maxRetries) {
+        console.error(`Todas as ${maxRetries} tentativas de conexão falharam`);
+        throw new Error(`Falha ao conectar ao MongoDB após ${maxRetries} tentativas: ${lastError?.message}`);
+      }
+
+      // Wait before retrying (exponential backoff)
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
     }
-    return client;
-  } catch (error) {
-    console.error("Falha ao conectar ao MongoDB:", error);
-    throw error;
   }
+
+  throw lastError;
 }
 
 // Check database connection

@@ -23,7 +23,7 @@ export async function fetchClientsFromDB(): Promise<Client[] | null> {
     return []
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -39,7 +39,7 @@ export async function fetchClientFromDB(id: string): Promise<Client | null> {
     return null;
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -49,13 +49,18 @@ export async function createClientInDB(clientData: any): Promise<Client | null> 
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.clients)
     const result = await collection.insertOne(clientData)
-    return { ...clientData, _id: result.insertedId.toString() }
+    
+    if (!result.acknowledged) {
+      throw new Error('Failed to insert client');
+    }
+    
+    return { ...clientData, _id: result.insertedId }
   } catch (error) {
     console.error("Erro ao criar cliente:", error)
     return null
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -72,7 +77,7 @@ export async function updateClientInDB(id: string, clientData: any): Promise<Boo
     return false;
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -89,7 +94,7 @@ export async function deleteClientFromDB(id: string): Promise<Boolean> {
     return false;
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -104,7 +109,7 @@ export async function fetchEventsFromDB(): Promise<Event[]> {
     return []
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -119,7 +124,7 @@ export async function fetchEventFromDB(id: string): Promise<Event | null> {
     console.error("Erro ao buscar evento:", error);
     return null;
   } finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -135,7 +140,7 @@ export async function fetchEventsByClientFromDB(clientId: string): Promise<Event
     return [];
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -157,7 +162,7 @@ export async function createEventInDB(eventData: Event): Promise<Event | null> {
     return null
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -173,7 +178,7 @@ export async function updateEventInDB(id: string, eventData: any): Promise<Boole
     return false;
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -189,7 +194,7 @@ export async function deleteEventFromDB(id: string): Promise<Boolean> {
     return false;
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -204,7 +209,7 @@ export async function fetchUsersFromDB(): Promise<User[]> {
     return []
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -220,7 +225,7 @@ export async function fetchUserByEmailFromDB(email: string): Promise<User | null
     return null
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -244,7 +249,7 @@ export async function createUserInDB(userData: any) {
     return null
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
@@ -254,13 +259,18 @@ export async function createLogInDB(logData: any) {
     const client = await connectToMongoDB()
     const collection = client.db(dbName).collection(collections.logs)
     const result = await collection.insertOne(logData)
-    return { ...logData, _id: result.insertedId.toString() }
+    
+    if (!result.acknowledged) {
+      throw new Error('Failed to insert log');
+    }
+    
+    return { ...logData, _id: result.insertedId }
   } catch (error) {
     console.error("Erro ao criar log:", error)
     return null
   }
   finally {
-    closeMongoDB();
+    await closeMongoDB();
   }
 }
 
