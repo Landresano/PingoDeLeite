@@ -1,4 +1,4 @@
-// Função para registrar ações e fornecer feedback
+ // Função para registrar ações e fornecer feedback
 export async function logAction(
   action: string,
   showToast: (options: { title: string; description: string; variant?: string }) => void,
