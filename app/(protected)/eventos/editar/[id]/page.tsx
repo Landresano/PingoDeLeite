@@ -14,7 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import {Event, Client} from "@/lib/types"
+import Event from "@/lib/types"
+import Client from "@/lib/types"
 import { calculateEventPrice, formatCurrency } from "@/lib/utils"
 import { handleError } from "@/lib/error-handler"
 import { fetchClientsFromDB, fetchEventsFromDB, fetchEventFromDB, updateEventInDB, fetchClientFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions

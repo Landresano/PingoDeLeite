@@ -5,8 +5,12 @@ import { connectToMongoDB, closeMongoDB } from "./client"
 import { dbName, collections } from "./config"
 import bcrypt from "bcryptjs";
 import { ObjectId } from "mongodb";
-import type {Client, Event, User} from "@/lib/types"
+import type Client from "@/lib/types"
+import type Event from "@/lib/types";
+import type User from "@/lib/types";
 import { handleError } from "@/lib/error-handler";
+
+
 
 // Buscar todos os clientes
 export async function fetchClientsFromDB(): Promise<Client[] | null> {
@@ -269,3 +273,35 @@ export async function createLogInDB(logData: any) {
     await closeMongoDB();
   }
 }
+
+// // Inicializar banco de dados com dados de exemplo
+// export async function initializeSampleDataInDB(sampleData: any) {
+//   try {
+//     const client = await connectToMongoDB()
+//     const db = client.db(dbName)
+
+//     // Verificar se as coleções estão vazias
+//     const clientsCount = await db.collection(collections.clients).countDocuments()
+//     if (clientsCount === 0 && sampleData.clients && sampleData.clients.length > 0) {
+//       await db.collection(collections.clients).insertMany(sampleData.clients)
+//       console.log(`Inicializado ${sampleData.clients.length} clientes de exemplo`)
+//     }
+
+//     const eventsCount = await db.collection(collections.events).countDocuments()
+//     if (eventsCount === 0 && sampleData.events && sampleData.events.length > 0) {
+//       await db.collection(collections.events).insertMany(sampleData.events)
+//       console.log(`Inicializado ${sampleData.events.length} eventos de exemplo`)
+//     }
+
+//     const usersCount = await db.collection(collections.users).countDocuments()
+//     if (usersCount === 0 && sampleData.users && sampleData.users.length > 0) {
+//       await db.collection(collections.users).insertMany(sampleData.users)
+//       console.log(`Inicializado ${sampleData.users.length} usuários de exemplo`)
+//     }
+
+//     return true
+//   } catch (error) {
+//     console.error("Erro ao inicializar dados de exemplo no MongoDB:", error)
+//     return false
+//   }
+// }

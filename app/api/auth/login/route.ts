@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { fetchUserByEmailFromDB } from "@/app/api/mongodb/actions" // Import MongoDB actions
-import {User} from "@/lib/types"
+import User from "@/lib/types"
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
