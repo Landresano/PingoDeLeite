@@ -34,7 +34,19 @@ export function formatDocument(value: string): string {
 }
 
 export function formataDatinhaDoMeuJeitinhoDoAmor(value: string): string {
-  return `${value.split("-")[2]}/${value.split("-")[1]}/${value.split("-")[0]}`
+  if(value.length == 10) 
+    //2025-05-24 -> 24/05/2025
+    return `${value.split("-")[2]}/${value.split("-")[1]}/${value.split("-")[0]}`
+  else if(value.length == 24) 
+  //2025-05-24T10:00:00.000Z -> 24/05/2025 10:00:00
+    if (parseInt(value.split(":")[0].split("T")[1], 10) < 3)
+      // Se o horário for menor que 3, então é o dia anterior
+      return `${parseInt(value.split("-")[2].split("T")[0], 10) - 1}/${value.split("-")[1]}/${value.split("-")[0]} ${25 - parseInt(value.split(":")[0].split("T")[1], 10)}:${value.split(":")[1]}:${value.split(":")[2].split(".")[0]}`
+    else 
+      // Se o horário for maior que 3, então é o mesmo dia
+    return `${value.split("-")[2].split("T")[0]}/${value.split("-")[1]}/${value.split("-")[0]} 0${value.split(":")[0].split("T")[1]-3}:${value.split(":")[1]}:${value.split(":")[2].split(".")[0]}`
+  else 
+    return value
 }
 
 
