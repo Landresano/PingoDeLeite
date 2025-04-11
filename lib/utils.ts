@@ -44,7 +44,7 @@ export function formataDatinhaDoMeuJeitinhoDoAmor(value: string): string {
       return `${parseInt(value.split("-")[2].split("T")[0], 10) - 1}/${value.split("-")[1]}/${value.split("-")[0]} ${25 - parseInt(value.split(":")[0].split("T")[1], 10)}:${value.split(":")[1]}:${value.split(":")[2].split(".")[0]}`
     else 
       // Se o horário for maior que 3, então é o mesmo dia
-    return `${value.split("-")[2].split("T")[0]}/${value.split("-")[1]}/${value.split("-")[0]} 0${value.split(":")[0].split("T")[1]-3}:${value.split(":")[1]}:${value.split(":")[2].split(".")[0]}`
+    return `${value.split("-")[2].split("T")[0]}/${value.split("-")[1]}/${value.split("-")[0]} 0${parseInt(value.split(":")[0].split("T")[1], 10) - 3}:${value.split(":")[1]}:${value.split(":")[2].split(".")[0]}`
   else 
     return value
 }

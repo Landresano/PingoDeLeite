@@ -12,11 +12,15 @@ export async function logAction(
   let userName = "desconhecido";
 
   try {
-    const userJson = localStorage.getItem("current_user");
-    if (userJson) {
-      const user = JSON.parse(userJson);
-      userId = user.id;
-      userName = user.name;
+    if (typeof localStorage !== "undefined") { // Verificar se localStorage está disponível
+      const userJson = localStorage.getItem("current_user");
+      if (userJson) {
+        const user = JSON.parse(userJson);
+        userId = user.id;
+        userName = user.name;
+      }
+    } else {
+      console.warn("localStorage não está disponível neste contexto.");
     }
   } catch (error) {
     console.error("Erro ao obter usuário atual para registro:", error);
@@ -38,16 +42,28 @@ export async function logAction(
   try {
     const response = await fetch("/api/logs", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json", // Ensure the server knows the client expects JSON
+      },
       body: JSON.stringify(logEntry),
       cache: "no-store", // Evitar cache
     });
 
     if (!response.ok) {
-      console.error("Falha ao salvar registro de ação na API:", response.status);
+      const errorText = await response.text(); // Capture server response for debugging
+      console.error(
+        `Falha ao salvar registro de ação na API: ${response.status} - ${response.statusText}`,
+        errorText
+      );
+      throw new Error(`API responded with status ${response.status}`);
     }
   } catch (apiError) {
-    console.error("Falha ao salvar registro de ação na API:", apiError);
+    if (apiError instanceof Error) {
+      console.error("Erro ao salvar registro de ação na API:", apiError.message);
+    } else {
+      console.error("Erro ao salvar registro de ação na API:", apiError);
+    }
   }
 
   // Mostrar notificação de feedback usando a função showToast
